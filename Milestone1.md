@@ -50,18 +50,18 @@
 
 ### Decision-Making
 
-- If there are any disagreements, the scrummaster decides
+- If there are any disagreements, the scrum-master decides
 - Descions will be made in meetings or over the teams chat
 
 ### Conflict Resolution
 
-- If there are any disagreements Levi has final say
-- If we can't come to a peaceful conclusion we will escalate to the proffesor
+- If there are any disagreements Nick has final say
+- If we can't come to a peaceful conclusion we will escalate to the professor
 
 ### Code of Conduct
 
 - Be kind
-- Everyone does their assignments, if there are problems they are comunicate as soon as possible
+- Everyone does their assignments, if there are problems they are communicate as soon as possible
 
 ## Technology Stack and Development Environment
 - Python / Supabase / PyQt 

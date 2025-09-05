@@ -35,7 +35,7 @@
 ### Source control setup
 
 - Github: gonzaloburga-cs/Library-Management-System
-- Jira
+- Jira: library-system.atlassian.net/jira/software/projects/LS/boards/3
 
 ## Team Charter & Communication Plan
 
@@ -46,7 +46,7 @@
 ### Meeting Format
 
 - Weekly meetings via teams
-- Go over any major updates / Go around the room – parking lot tech discussion
+-Go over any major updates -> Go around the room getting updates on current tickets and any problems or roadblocks – parking lot tech discussions -> Go over any new tickets that will be made and assign them 
 
 ### Decision-Making
 
@@ -64,11 +64,13 @@
 - Everyone does their assignments, if there are problems they are comunicate as soon as possible
 
 ## Technology Stack and Development Environment
+- Python / Supabase / PyQt 
 
 ### Repository Setup
 
 - GitHub: github.com/gonzaloburga-cs/Library-Management-System
-- Branch Strategy: (How do we want to name braches/handle branches?)
+- Branch Strategy: Branch names will be your name the ticket number and a brief description (i.e. nick/ls-3-update-readme)
+- Each branch will need a PR reviewed by 2 people before merged to main
 
 ### Pull Request & Review Process
 

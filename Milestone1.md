@@ -1,4 +1,4 @@
-# Milestone 1
+# Milestone 1 Week 3
 
 ## Project Launch Details
 
@@ -11,7 +11,7 @@
 
 ### Meeting Schedule
 
-- Monday’s 5:30pm
+- Monday’s 5:30 pm
 
 ### Scrum Master Rotation Schedule
 
@@ -28,6 +28,11 @@
 
 - Python 3.13
 
+### IDE and Tool chains
+
+- IDE - VS Code
+- Python extension in VS Code
+
 #### PR and review Process
 
 **Pull Main** -> **Create a branch** -> **Make changes** -> **Create a PR** -> **2 people Review** -> **Merge**
@@ -42,26 +47,29 @@
 ### Roles & Responsebilities
 
 - Rotating roles (people filling in where necessary)
+- Set up GitHub Repo and invite all team members - Gonzalo
+- Set up Jira Kanban and invite all team members - Nick
+- Rough design of Library Management System - Everyone
 
 ### Meeting Format
 
-- Weekly meetings via teams
+- Weekly meetings via Teams
 -Go over any major updates -> Go around the room getting updates on current tickets and any problems or roadblocks – parking lot tech discussions -> Go over any new tickets that will be made and assign them 
 
 ### Decision-Making
 
 - If there are any disagreements, the scrum-master decides
-- Descions will be made in meetings or over the teams chat
+- Decisions will be made in meetings or over the Teams chat
 
 ### Conflict Resolution
 
-- If there are any disagreements Nick has final say
-- If we can't come to a peaceful conclusion we will escalate to the professor
+- If there are any disagreements, Nick has final say
+- If we can't come to a peaceful conclusion, we will escalate to the professor
 
 ### Code of Conduct
 
 - Be kind
-- Everyone does their assignments, if there are problems they are communicate as soon as possible
+- Everyone does their assignments, if there are problems, they are communicated as soon as possible
 
 ## Technology Stack and Development Environment
 - Python / Supabase / PyQt 

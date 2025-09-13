@@ -1,5 +1,4 @@
 from logging.config import fileConfig
-from urllib.parse import quote_plus
 
 from dotenv import load_dotenv
 
@@ -11,10 +10,7 @@ from alembic import context
 import os
 load_dotenv()
 
-password = os.getenv("SUPABASE_DATABASE_PASSWORD")
-username = os.getenv("SUPABASE_DATABASE_USERNAME")
-host = os.getenv("SUPABASE_DATABASE_HOST")
-url = "postgresql://"+username+":"+quote_plus(password) + "@" + host
+url = os.getenv("SUPABASE_DATABASE_URL")
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

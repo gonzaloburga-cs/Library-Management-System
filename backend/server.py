@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 from fastapi import FastAPI, Depends, Request
 
-from urllib.parse import quote_plus
-
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker, declarative_base
 
@@ -12,11 +10,8 @@ import os
 
 load_dotenv()
 
-password = os.getenv("SUPABASE_DATABASE_PASSWORD")
-username = os.getenv("SUPABASE_DATABASE_USERNAME")
-host = os.getenv("SUPABASE_DATABASE_HOST")
+url = os.getenv("SUPABASE_DATABASE_URL")
 
-url = "postgresql://"+username+":"+quote_plus(password) + "@" + host
 engine = create_engine(url)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base
@@ -51,7 +46,7 @@ def get_books(db: SessionLocal = Depends(get_db_session)):
 
 
 # Creates a new book in the database
-# todo check for existing isbn and increment quantity (column needs to be added to database)
+# todo check for existing isbn and throw in an error or in the future increment quantity (column needs to be added to database)
 @app.put("/book")
 async def create_book(request: Request, db: SessionLocal = Depends(get_db_session)):
     data = await request.json()

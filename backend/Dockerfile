@@ -1,4 +1,9 @@
 FROM python:3.13-slim
+# Install system dependencies for psycopg2
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    libpq-dev \
+  && rm -rf /var/lib/apt/lists/*
 
 # Install dependencies
 WORKDIR /backend-app

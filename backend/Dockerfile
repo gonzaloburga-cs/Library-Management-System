@@ -1,9 +1,4 @@
 FROM python:3.13-slim
-# Install system dependencies for psycopg2
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc \
-    libpq-dev \
-  && rm -rf /var/lib/apt/lists/*
 
 # Install dependencies
 WORKDIR /backend-app
@@ -17,4 +12,4 @@ COPY . .
 EXPOSE 9713
 
 # Start FastAPI using uvicorn
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "9713"]
+CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "9713"]

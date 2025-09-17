@@ -3,6 +3,8 @@
 #imports
 import server
 import json
+import maskpass, asyncio
+from fastapi import Request
 
 #functions
 def print_menu():
@@ -13,13 +15,19 @@ def print_menu():
     print("5. Login")
     print("6. Exit")
 
-def longin():
+def hello_world():
+    message = server.hello_world()
+    print(message["message"])
+
+def login():
     email = input("Enter your email: ")
-    password = input("Enter your password: ")
+    password = maskpass.askpass("Enter your password: ")
+    request = Request(scope= None,send=json.dumps({"email": email, "password": password}).encode('utf-8')) # TO DO: fix this
+
     #call server auth function
-    request = "{\"email\":\""+email+"\"\",\"password\":\""+password+"\"}"
-    token = server.post_auth(email, password) # TO DO: pass the correct parameters
+    token = asyncio.run(server.post_auth(request)) # TO DO: pass the correct parameters
     return token
+    
 
 def get_books():
     server.get_books()
@@ -37,8 +45,11 @@ def return_book():
 
 #main
 def main():
-    server.get_db_session()
-    server.hello_world()
+    # server.get_db_session()
+    hello_world()
+
+    token = login()
+    print("Your token is: " + token)
 
 if __name__ == "__main__":
     main()

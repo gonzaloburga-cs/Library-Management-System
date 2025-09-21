@@ -116,7 +116,7 @@ def return_book(): # TO DO: implement return functionality in the backend and ca
     pass
 
 def clear_screen():
-    if sys.platform == "windows":
+    if sys.platform == "win32":
         os.system('cls') # for windows
     else:
         os.system('clear') # for linux, mac, etc.

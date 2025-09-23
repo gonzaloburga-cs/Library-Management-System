@@ -5,6 +5,7 @@ import server
 import json
 import maskpass, asyncio, requests 
 import sys, os
+from time import sleep
 
 #functions
 def print_menu():
@@ -32,6 +33,7 @@ def login() -> None: # puts token in global scope
             token = f.read().strip()
             if token:
                 print("Logged in using saved token.")
+                sleep(2)
                 return
     except FileNotFoundError:
         pass
@@ -39,9 +41,8 @@ def login() -> None: # puts token in global scope
         email = input("Enter your email: ")
         password = maskpass.askpass("Enter your password: ")
         payload = '{"email": "'+email+'", "password": "'+password+'"}'
-        # response = requests.post('http://lms.murtsa.dev/auth', data= payload) # TO DO: fix this
-        response = requests.post('http://127.0.0.1:8000/auth', data= payload) # for testing local server
-        # global token
+        response = requests.post('https://lms.murtsa.dev/auth', data= payload) # TO DO: fix this
+        # response = requests.post('http://127.0.0.1:8000/auth', data= payload) # for testing local server
         token = response.text # the request hits the server, but it returns an empty string
         if response.status_code != 200:
             print(f"Login failed. Status code {response.status_code} for reason {response.reason}. \nPlease check your credentials and try again.\n")
@@ -69,14 +70,12 @@ def login() -> None: # puts token in global scope
     except Exception as e:
         print(f"Failed to save token to file: {e}")
     print("Login successful!")
-#  call server auth function
- #   token = asyncio.run(server.post_auth(request)) # TO DO: pass the correct parameters
     
     
 
 def get_books():
-    # response = requests.get('http://lms.murtsa.dev/books')
-    response = requests.get('http://127.0.0.1:8000/books')
+    response = requests.get('https://lms.murtsa.dev/books')
+    # response = requests.get('http://127.0.0.1:8000/books')
 
     try:
         data = response.json()
@@ -96,8 +95,8 @@ def add_book():
     isbn = input("Enter book ISBN: ")
     headers = {"Authorization": token, "Content-Type": "application/json"}
     payload = {"title": title, "author": author, "isbn": isbn}
-    # response = requests.put('http://lms.murtsa.dev/book', headers=headers, json=payload)
-    response = requests.put('http://127.0.0.1:8000/book', headers=headers, json=payload)
+    response = requests.put('https://lms.murtsa.dev/book', headers=headers, json=payload)
+    # response = requests.put('http://127.0.0.1:8000/book', headers=headers, json=payload)
     if response.status_code != 200:
         print(f"Failed to add book. Status code: {response.status_code}, Response: {response.text}\n")
         return

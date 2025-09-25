@@ -21,6 +21,8 @@ def print_menu():
     else:
         print("5. Logout")
     print("6. Exit")
+    if not "token" in globals():
+        print("7. Sign Up")
 
 
 def hello_world():
@@ -47,10 +49,9 @@ def login() -> None:  # puts token in global scope
         email = input("Enter your email: ")
         password = maskpass.askpass("Enter your password: ")
         payload = '{"email": "' + email + '", "password": "' + password + '"}'
-        # response = requests.post('http://lms.murtsa.dev/auth', data= payload) # TO DO: fix this
-        response = requests.post(
-            "http://127.0.0.1:8000/auth", data=payload
-        )  # for testing local server
+        response = requests.post('https://lms.murtsa.dev/auth', data= payload) # TO DO: fix this
+        # response = requests.post("http://127.0.0.1:8000/auth", data=payload)
+        # for testing local server
         # global token
         token = (
             response.text
@@ -89,9 +90,22 @@ def login() -> None:  # puts token in global scope
 #   token = asyncio.run(server.post_auth(request)) # TO DO: pass the correct parameters
 
 
+def signup():
+    email = input("Enter your email: ")
+    password = maskpass.askpass("Enter your password: ")
+    payload = '{"email": "' + email + '", "password": "' + password + '"}'
+    response = requests.post('https://lms.murtsa.dev/signup', data=payload)
+    if response.status_code == 200:
+        print("User Created Successfully!")
+        return
+    else:
+        print("Failed to create user")
+        print_menu()
+        return
+
 def get_books():
-    # response = requests.get('http://lms.murtsa.dev/books')
-    response = requests.get("http://127.0.0.1:8000/books")
+    response = requests.get('https://lms.murtsa.dev/books')
+    # response = requests.get("http://127.0.0.1:8000/books")
 
     try:
         data = response.json()
@@ -114,8 +128,8 @@ def add_book():
     isbn = input("Enter book ISBN: ")
     headers = '{"Authorization": ' + token + ', "Content-Type": "application/json"}'
     payload = '{"title": ' + title + ', "author": ' + author + ', "isbn": ' + isbn + "}"
-    # response = requests.put('http://lms.murtsa.dev/book', headers=headers, json=payload)
-    response = requests.put("http://127.0.0.1:8000/book", headers=headers, json=payload)
+    response = requests.put('https://lms.murtsa.dev/book', headers=headers, json=payload)
+    # response = requests.put("http://127.0.0.1:8000/book", headers=headers, json=payload)
     if response.status_code != 200:
         print(
             f"Failed to add book. Status code: {response.status_code}, Response: {response.text}\n"
@@ -127,14 +141,41 @@ def add_book():
 
 def checkout_book():
     get_books()
+    headers = '{"Authorization": ' + token + ', "Content-Type": "application/json"}'
+
     book_id = input("Enter the ID of the book you want to checkout: ")
-    # TO DO: implement checkout functionality in the backend and call it here
-    print(f"Book with ID {book_id} checked out successfully!\n")
+    user_id = requests.get("https://lms.murtsa.dev/user", headers=headers)
+    if user_id.status_code != 200:
+        print("Session expired sign in again to checkout a book")
+        return
+
+    payload = '{"book_id": ' + book_id + ', "user_id": ' + user_id + '}'
+    response = requests.put('https://lms.murtsa.dev/checkout', headers=headers, json=payload)
+    if response.status_code == 200:
+        print(f"Book with ID {book_id} checked out successfully!\n")
+    else:
+        print(f"Book with ID {book_id} has already been checked out by another user")
     return
 
 
-def return_book():  # TO DO: implement return functionality in the backend and call it here
-    pass
+def return_book():
+    get_books()
+    headers = '{"Authorization": ' + token + ', "Content-Type": "application/json"}'
+
+    book_id = input("Enter the ID of the book you want to return: ")
+    user_id = requests.get("https://lms.murtsa.dev/user", headers=headers)
+    if user_id.status_code != 200:
+        print("Session expired sign in again to checkout a book")
+        return
+
+    payload = '{"book_id": ' + book_id + ', "user_id": ' + user_id + '}'
+    response = requests.put('https://lms.murtsa.dev/return', headers=headers, json=payload)
+    if response.status_code == 200:
+        print(f"Book with ID {book_id} was returned successfully!\n")
+    else:
+        print(f"Book with ID {book_id} hasn't been checked out by you")
+    return
+
 
 
 def clear_screen():
@@ -186,6 +227,8 @@ def main():
                 case "6":
                     print("Exiting...")
                     break
+                case "7":
+                       signup()
                 case _:
                     print("Invalid choice. Please try again.")
 

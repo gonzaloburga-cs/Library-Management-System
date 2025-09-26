@@ -99,7 +99,7 @@ async def create_book(request: Request):
 
 
 @app.put("/checkout")
-async def create_book(request: Request):
+async def checkout_book(request: Request):
     data = await request.json()
     auth_token = request.headers["Authorization"]
     supabase.postgrest.auth(auth_token)
@@ -117,7 +117,7 @@ async def create_book(request: Request):
 
 
 @app.put("/return")
-async def create_book(request: Request):
+async def return_book(request: Request):
     data = await request.json()
     auth_token = request.headers["Authorization"]
     current_date = datetime.now(timezone.utc)

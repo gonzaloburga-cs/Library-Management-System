@@ -125,8 +125,8 @@ def signup():
         return
 
 def get_books():
-    # response = requests.get('https://lms.murtsa.dev/books')
-    response = requests.get("http://127.0.0.1:8000/books")
+    response = requests.get('https://lms.murtsa.dev/books')
+    # response = requests.get("http://127.0.0.1:8000/books")
 
     try:
         data = response.json()
@@ -205,10 +205,12 @@ def return_book():
 
 
 def clear_screen():
-    if sys.platform == "win32":
+    if os.name == "nt":
         os.system("cls")  # for windows
     else:
         os.system("clear")  # for linux, mac, etc.
+
+
 
 
 # main
@@ -221,8 +223,8 @@ def main():
 
     try:
         # print("Please Choose an option:")
+        print_menu()
         while True:
-            print_menu()
             number = input("Enter your choice: ")
             match number:
                 case "0":
@@ -252,10 +254,10 @@ def main():
                         # global token  # to modify the global token variable
                         # del token  # remove token from global scope
                         print("Logged out successfully.")
-                        # print_menu()
+                        print_menu()
                     else:
                         login()
-                        # print_menu()
+                        print_menu()
                 case "6":
                     print("Exiting...")
                     break

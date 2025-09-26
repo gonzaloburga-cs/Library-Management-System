@@ -38,7 +38,6 @@ def is_logged_in() -> bool:
             if token:
                 response = requests.get("https://lms.murtsa.dev/user", headers={"Authorization": token})
                 if response.status_code != 200:
-                    os.remove("token.txt")
                     del token
                     raise Exception("Invalid token")
             print("Logged in using saved token.")

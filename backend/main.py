@@ -197,7 +197,7 @@ def return_book():
     # response = requests.put('http://127.0.0.1:8000/return', headers=headers, json=payload)
     if response.status_code == 200:
         print("\n"+response.text.strip('"'))
-        sleep(2)
+        sleep(sleep_time)
     else:
         print(f"\nFailed to return book. Status code: {response.status_code}, Response: {response.text}\n")
         sleep(sleep_time)

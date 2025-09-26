@@ -6,7 +6,9 @@ import json
 import maskpass, asyncio, requests
 import sys, os
 import traceback
+from time import sleep
 
+sleep_time = 2  # seconds
 
 # functions
 def print_menu():
@@ -150,7 +152,8 @@ def add_book():
         )
         input("Press Enter to continue...")
         return
-    print("Book added successfully!\n")
+    print("\nBook added successfully!\n")
+    sleep(sleep_time)
     return
 
 
@@ -170,9 +173,11 @@ def checkout_book():
     response = requests.put('https://lms.murtsa.dev/checkout', headers=headers, json=payload)
     # response = requests.put('http://127.0.0.1:8000/checkout', headers=headers, json=payload)
     if response.status_code == 200:
-        print(response.text.strip('"'))
+        print("\n"+response.text.strip('"'))
+        sleep(sleep_time)
     else:
-        print(f"Failed to checkout book. Status code: {response.status_code}, Response: {response.text}\n")
+        print(f"\nFailed to checkout book. Status code: {response.status_code}, Response: {response.text}\n")
+        sleep(sleep_time)
     return
 
 
@@ -191,9 +196,11 @@ def return_book():
     response = requests.put('https://lms.murtsa.dev/return', headers=headers, json=payload)
     # response = requests.put('http://127.0.0.1:8000/return', headers=headers, json=payload)
     if response.status_code == 200:
-        print(response.text.strip('"'))
+        print("\n"+response.text.strip('"'))
+        sleep(2)
     else:
-        print(f"Failed to return book. Status code: {response.status_code}, Response: {response.text}\n")
+        print(f"\nFailed to return book. Status code: {response.status_code}, Response: {response.text}\n")
+        sleep(sleep_time)
     return
 
 

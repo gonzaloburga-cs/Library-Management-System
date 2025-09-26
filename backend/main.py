@@ -38,6 +38,7 @@ def check_login() -> None:
             if token:
                 response = requests.get("https://lms.murtsa.dev/user", headers={"Authorization": token.strip('"')})
                 if response.status_code != 200:
+                    os.remove("token.txt")
                     del token
                     raise Exception("Invalid token")
                 
@@ -54,7 +55,7 @@ def check_login() -> None:
                     
             print("Logged in using saved token.")
     except FileNotFoundError:
-        return
+        raise Exception("No saved token")
 
 def login() -> None:  # puts token in global scope
     try:
@@ -161,7 +162,7 @@ def add_book():
 
 def checkout_book():
     get_books()
-    headers = '{"Authorization": ' + token + ', "Content-Type": "application/json"}'
+    headers = {"Authorization": token.strip('"'), "Content-Type": "application/json"}
 
     book_id = input("Enter the ID of the book you want to checkout: ")
     user_id = requests.get("https://lms.murtsa.dev/user", headers=headers)
@@ -169,7 +170,7 @@ def checkout_book():
         print("Session expired sign in again to checkout a book")
         return
 
-    payload = '{"book_id": ' + book_id + ', "user_id": ' + user_id + '}'
+    payload = '{"book_id": "' + book_id + '", "user_id": ' + user_id.text + '}'
     response = requests.put('https://lms.murtsa.dev/checkout', headers=headers, json=payload)
     if response.status_code == 200:
         print(f"Book with ID {book_id} checked out successfully!\n")
@@ -180,7 +181,7 @@ def checkout_book():
 
 def return_book():
     get_books()
-    headers = '{"Authorization": ' + token + ', "Content-Type": "application/json"}'
+    headers = {"Authorization": token.strip('"'), "Content-Type": "application/json"}
 
     book_id = input("Enter the ID of the book you want to return: ")
     user_id = requests.get("https://lms.murtsa.dev/user", headers=headers)
@@ -188,7 +189,7 @@ def return_book():
         print("Session expired sign in again to checkout a book")
         return
 
-    payload = '{"book_id": ' + book_id + ', "user_id": ' + user_id + '}'
+    payload = '{"book_id": "' + book_id + '", "user_id": ' + user_id.text + '}'
     response = requests.put('https://lms.murtsa.dev/return', headers=headers, json=payload)
     if response.status_code == 200:
         print(f"Book with ID {book_id} was returned successfully!\n")

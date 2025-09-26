@@ -5,14 +5,11 @@ import os
 import pytest
 from fastapi.testclient import TestClient
 from backend.server import app
-from unittest.mock import patch, MagicMock, mock_open
+from unittest.mock import patch, MagicMock, mock_open #doesn't touch real files
 import backend.main as cli
 
 
 client = TestClient(app)
-
-
-
 
 #interaction with server
 def test_hello_world_server():
@@ -31,11 +28,9 @@ def test_get_books_server():
 #Isolated tests for CLI functions (not interacting with server)
 #These use "Mock Testing"
 
-
-
 def test_print_menu(capsys):
     if "token" in globals():
-        del cli.token
+        del cli.token        #logged out state
 
     cli.print_menu()
     captured = capsys.readouterr()
@@ -90,11 +85,6 @@ def test_logout(mock_sign_out):
 
 
 
-
-
-
-
-
 #login tests
 
 @patch("builtins.input", side_effect=["rootbeerlover@yahoo.com"]) #mock input for email
@@ -102,6 +92,9 @@ def test_logout(mock_sign_out):
 @patch("backend.main.requests.get")
 @patch("backend.main.requests.post")
 def test_login_success(mock_post, mock_get, mock_pass, mock_input, tmp_path):
+
+    '''Simulates server returning valid token and session'''
+
     post_response = MagicMock()
     post_response.status_code = 200
     post_response.text = "fake_token"

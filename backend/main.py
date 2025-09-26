@@ -30,7 +30,7 @@ def hello_world():
     message = server.hello_world()
     print(message["message"])
 
-def check_login() -> None:
+def is_logged_in() -> bool:
     try:  # Basic token persistence
         with open("token.txt", "r") as f:
             global token
@@ -41,29 +41,16 @@ def check_login() -> None:
                     os.remove("token.txt")
                     del token
                     raise Exception("Invalid token")
-                
-                # Uncomment below to verify token with supabase directly
-                # try:
-                #     user = server.supabase.auth.get_user(token.strip('"'))
-                # except Exception:
-                #     # traceback.print_exc() # uncomment for debugging
-                #     del token
-                #     return
-                # if user == None:
-                #     del token
-                #     raise Exception("Invalid token")
-                    
             print("Logged in using saved token.")
+            return True
     except FileNotFoundError:
-        raise Exception("No saved token")
+        return False
 
 def login() -> None:  # puts token in global scope
-    try:
-        check_login()
-    except Exception:
-        pass
-    else:
-        return  # already logged in
+    
+    if is_logged_in():
+        return
+    
 
     while True:
         email = input("Enter your email: ")
@@ -220,11 +207,10 @@ def clear_screen():
 # main
 def main():
     
-    try:
-        check_login()
-    except Exception:
+    
+    if is_logged_in():
         pass
-
+    
     try:
         # print("Please Choose an option:")
         while True:

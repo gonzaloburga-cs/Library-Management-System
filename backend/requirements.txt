@@ -6,3 +6,6 @@ psycopg2-binary
 supabase
 httpx # for testing
 pytest # for testing
+pytest-mock
+maskpass
+requests

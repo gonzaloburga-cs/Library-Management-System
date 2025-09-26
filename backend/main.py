@@ -5,6 +5,7 @@ import server
 import json
 import maskpass, asyncio, requests
 import sys, os
+import traceback
 
 
 # functions
@@ -29,33 +30,49 @@ def hello_world():
     message = server.hello_world()
     print(message["message"])
 
-
-def login() -> None:  # puts token in global scope
+def check_login() -> None:
     try:  # Basic token persistence
         with open("token.txt", "r") as f:
             global token
             token = f.read().strip()
-            # Currently broken, I'll find a good spot for this.
-            # if token:
-            #     try:
-            #         server.supabase.auth.get_user(token)
-            #     finally:
-            #         pass
+            if token:
+                response = requests.get("https://lms.murtsa.dev/user", headers={"Authorization": token.strip('"')})
+                if response.status_code != 200:
+                    del token
+                    raise Exception("Invalid token")
+                
+                # Uncomment below to verify token with supabase directly
+                # try:
+                #     user = server.supabase.auth.get_user(token.strip('"'))
+                # except Exception:
+                #     # traceback.print_exc() # uncomment for debugging
+                #     del token
+                #     return
+                # if user == None:
+                #     del token
+                #     raise Exception("Invalid token")
+                    
             print("Logged in using saved token.")
-            return
     except FileNotFoundError:
+        return
+
+def login() -> None:  # puts token in global scope
+    try:
+        check_login()
+    except Exception:
         pass
+    else:
+        return  # already logged in
+
     while True:
         email = input("Enter your email: ")
         password = maskpass.askpass("Enter your password: ")
         payload = '{"email": "' + email + '", "password": "' + password + '"}'
-        response = requests.post('https://lms.murtsa.dev/auth', data= payload) # TO DO: fix this
+        response = requests.post('https://lms.murtsa.dev/auth', data= payload)
         # response = requests.post("http://127.0.0.1:8000/auth", data=payload)
         # for testing local server
-        # global token
-        token = (
-            response.text
-        )  # the request hits the server, but it returns an empty string
+        global token
+        token = response.text  # the request hits the server, but it returns an empty string
         if response.status_code != 200:
             print(
                 f"Login failed. Status code {response.status_code} for reason {response.reason}. \nPlease check your credentials and try again.\n"
@@ -85,9 +102,12 @@ def login() -> None:  # puts token in global scope
         print(f"Failed to save token to file: {e}")
     print("Login successful!")
 
-
-#  call server auth function
-#   token = asyncio.run(server.post_auth(request)) # TO DO: pass the correct parameters
+def logout():
+    global token  # to modify the global token variable
+    server.supabase.auth.sign_out()
+    # server.supabase.auth.admin.sign_out(token.strip('"'))
+    del token  # remove token from global scope
+    return
 
 
 def signup():
@@ -187,7 +207,12 @@ def clear_screen():
 
 # main
 def main():
-    # server.get_db_session()
+    
+    try:
+        check_login()
+    except Exception:
+        pass
+
     try:
         # print("Please Choose an option:")
         print_menu()
@@ -217,8 +242,9 @@ def main():
                         print("You must be logged in to return a book.")
                 case "5":
                     if "token" in globals():
-                        global token  # to modify the global token variable
-                        del token  # remove token from global scope
+                        logout()
+                        # global token  # to modify the global token variable
+                        # del token  # remove token from global scope
                         print("Logged out successfully.")
                         print_menu()
                     else:
@@ -236,7 +262,8 @@ def main():
         print("\nExiting...")
         sys.exit(0)
     except Exception as e:
-        print(f"An error occurred: {e}")
+        # print(f"An error occurred: {e}")
+        traceback.print_exc() # uncomment for debugging
     finally:
         print("Goodbye!")
         sys.exit(0)

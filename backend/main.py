@@ -11,7 +11,7 @@ from time import sleep
 sleep_time = 2  # seconds
 
 # functions
-def print_menu():
+def print_menu() -> None:
     clear_screen()
     print("Library Management System Menu")
     print("0. Show Menu")
@@ -95,7 +95,7 @@ def login() -> None:  # puts token in global scope
         print(f"Failed to save token to file: {e}")
     print("Login successful!")
 
-def logout():
+def logout() -> None:
     global token  # to modify the global token variable
     server.supabase.auth.sign_out()
     # server.supabase.auth.admin.sign_out(token.strip('"'))
@@ -103,7 +103,7 @@ def logout():
     return
 
 
-def signup():
+def signup() -> None:
     email = input("Enter your email: ")
     password = maskpass.askpass("Enter your password: ")
     payload = '{"email": "' + email + '", "password": "' + password + '"}'
@@ -116,7 +116,7 @@ def signup():
         print_menu()
         return
 
-def get_books():
+def print_books() -> None:
     clear_screen()
     response = requests.get('https://lms.murtsa.dev/books')
     # response = requests.get("http://127.0.0.1:8000/books")
@@ -138,7 +138,7 @@ def get_books():
     input("\nPress Enter to continue...")
 
 
-def add_book():
+def add_book() -> None:
     title = input("Enter book title: ")
     author = input("Enter book author: ")
     isbn = input("Enter book ISBN: ")
@@ -157,8 +157,8 @@ def add_book():
     return
 
 
-def checkout_book():
-    get_books()
+def checkout_book() -> None:
+    print_books()
     headers = {"Authorization": token, "Content-Type": "application/json"}
 
     book_id = input("Enter the ID of the book you want to checkout: ")
@@ -181,8 +181,8 @@ def checkout_book():
     return
 
 
-def return_book():
-    get_books()
+def return_book() -> None:
+    print_books()
     headers = {"Authorization": token, "Content-Type": "application/json"}
 
     book_id = input("Enter the ID of the book you want to return: ")
@@ -205,7 +205,7 @@ def return_book():
 
 
 
-def clear_screen():
+def clear_screen() -> None:
     if os.name == "nt":
         os.system("cls")  # for windows
     else:
@@ -230,7 +230,7 @@ def main():
                 case "0":
                     print_menu()
                 case "1":
-                    get_books()
+                    print_books()
 
                 case "2":
                     if "token" in globals():

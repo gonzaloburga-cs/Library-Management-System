@@ -124,8 +124,8 @@ async def create_book(request: Request):
     supabase.postgrest.auth(auth_token)
 
     # queries
-    is_checked_out = "SELECT * FROM checkout_logs WHERE checkin_date IS NULL AND book_id = :book_id and user_id = :user_id"
-    return_book = "UPDATE checkout_logs SET checkin_date = :current_date where checkin_date IS NULL AND book_id = :book_id and user_id = :user_id"
+    is_checked_out = "SELECT * FROM checkout_logs WHERE checkin_date IS NULL AND book_id = :book_id AND user_id = :user_id"
+    return_book = "UPDATE checkout_logs SET checkin_date = :current_date where checkin_date IS NULL AND book_id = :book_id AND user_id = :user_id"
 
     with engine.connect() as connection:
         result = connection.execute(text(is_checked_out), {"book_id": data["book_id"], "user_id": data["user_id"]})

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/.env python3
 from fastapi import FastAPI, Depends, Request
 
 from sqlalchemy import create_engine, text

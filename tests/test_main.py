@@ -15,7 +15,7 @@ client = TestClient(app)
 
 
 #interaction with server
-def test_hello_world():
+def test_hello_world_server():
     response = client.get("/")
     assert response.status_code == 200
     assert response.json() == {"message": "Hello World"}
@@ -29,6 +29,8 @@ def test_get_books_server():
 
 
 #Isolated tests for CLI functions (not interacting with server)
+#These use "Mock Testing"
+
 
 
 def test_print_menu(capsys):
@@ -50,7 +52,51 @@ def test_print_menu(capsys):
 
 
 
-#login
+#patch decorators are applied bottom to top
+
+#logged in tests
+
+@patch("builtins.open", new_callable=mock_open, read_data="fake_token") #mock open to simulate reading a token from file
+@patch("backend.main.requests.get") #mock requests.get to simulate server response
+@patch("os.remove") #mock os.remove so no files are deleted during testing
+def test_is_logged_in_no_token_file(mock_remove, mock_get, mock_file):
+    mock_get.return_value.status_code = 401  #simulate invalid/expired token response from server
+    assert cli.is_logged_in() == False
+    mock_remove.assert_called_once_with("token.txt")
+    assert not "token" in globals() #token should be deleted
+
+
+@patch("builtins.open", new_callable=mock_open, read_data="fake_token") #mock open to simulate reading a token from file
+@patch("backend.main.requests.get") #mock requests.get to simulate server response
+def test_is_logged_in_success(mock_get, mock_file, capsys):
+    mock_get.return_value.status_code = 200  #simulate valid token response from server
+    assert cli.is_logged_in() == True
+    captured = capsys.readouterr()
+    output = captured.out
+    assert "Logged in using saved token." in output
+    del cli.token  # reset token for later tests
+
+
+
+
+#logout
+
+@patch("backend.main.server.supabase.auth.sign_out")
+def test_logout(mock_sign_out):
+    cli.token = "fake_token"
+    cli.logout()
+    mock_sign_out.assert_called_once()
+    assert not "token" in globals() #token should be deleted
+
+
+
+
+
+
+
+
+#login tests
+
 @patch("builtins.input", side_effect=["rootbeerlover@yahoo.com"]) #mock input for email
 @patch("backend.main.maskpass.askpass", return_value="Barqs0nT0p!")
 @patch("backend.main.requests.get")
@@ -72,10 +118,11 @@ def test_login_success(mock_post, mock_get, mock_pass, mock_input, tmp_path):
     mock_file.assert_called_with("token.txt", "r")
 
 
+
 @patch("builtins.input", side_effect=["bugjelly@uvu.edu", "n"]) #mock input for email; n for retry
 @patch("backend.main.maskpass.askpass", return_value="bugjam")
 @patch("backend.main.requests.post")
-def test_login_failure(mock_post, mock_pass, mock_input, capsys, tmp_path):
+def test_login_failure_unauthorized(mock_post, mock_pass, mock_input, capsys, tmp_path):
     token_file = tmp_path / "token.txt"
     cli.token_file_path = str(token_file)
     if token_file.exists():
@@ -93,6 +140,52 @@ def test_login_failure(mock_post, mock_pass, mock_input, capsys, tmp_path):
     output = captured.out
     assert "Login failed. Status code 401 for reason Unauthorized." in output
     assert "Please check your credentials and try again." in output
+
+@patch("builtins.input", side_effect=["milesdavis@gmail.com", "n"]) #mock input for email; n for retry
+@patch("backend.main.maskpass.askpass", return_value="ihatetrumpets")
+@patch("backend.main.requests.post")
+@patch("backend.main.requests.get")
+def test_login_failure_empty_token(mock_get, mock_post, mock_pass, mock_input, capsys, tmp_path):
+    token_file = tmp_path / "token.txt"
+    cli.token_file_path = str(token_file)
+    if token_file.exists():
+        token_file.unlink()
+
+    post_response = MagicMock()
+    post_response.status_code = 200
+    post_response.text = ""  # Simulate empty token response
+    mock_post.return_value = post_response
+
+    cli.login()
+
+    captured = capsys.readouterr()
+    output = captured.out
+    assert "Login failed. Invalid credentials." in output
+
+
+
+
+@patch("builtins.input", side_effect=["jeffbezos@amazon.com"])
+@patch("backend.main.maskpass.askpass", return_value="Iamrich")
+@patch("backend.main.requests.post")
+def test_signup_success(mock_post, mock_pass, mock_input, capsys):
+    mock_post.return_value.status_code = 200
+    cli.signup()
+    captured = capsys.readouterr()
+    output = captured.out
+    assert "User Created Successfully!" in output
+
+
+@patch("builtins.input", side_effect=["jeffbezos@amazon.com"])
+@patch("backend.main.maskpass.askpass", return_value="Iamrich")
+@patch("backend.main.requests.post")
+def test_signup_failure(mock_post, mock_pass, mock_input, capsys):
+    mock_post.return_value.status_code = 500
+    cli.signup()
+    captured = capsys.readouterr()
+    output = captured.out
+    assert "Failed to create user" in output
+
 
 #get_books
 @patch('backend.main.requests.get')
@@ -136,11 +229,22 @@ def test_get_books(mock_get, capsys):
     assert "Frank Herbert" in output
 
 
+@patch('backend.main.requests.get')
+def test_get_books_empty(mock_get, capsys):
+    mock_response = MagicMock()
+    mock_response.status_code = 200
+    mock_response.json.return_value = {"data": []}
+    mock_get.return_value = mock_response
+    books = cli.get_books()
+    captured = capsys.readouterr()
+    output = captured.out
+    assert books == None
+
 
 
 #add_book
 
-#patch decorators are applied bottom to top
+
 @patch("builtins.input", side_effect=["Atlas Shrugged", "Ayn Rand", "123-456"]) #input for the 3 input calls
 @patch("backend.main.requests.put") #requests.put is now the first parameter in test (mock_put)
 def test_add_book(mock_put, mock_input, capsys):
@@ -174,11 +278,14 @@ def test_add_book_500(mock_put, mock_input, capsys):
 
 
 #checkout_book
-
-@patch("builtins.input", side_effect=["1"]) #input for the 1 input call
 @patch("backend.main.get_books")
-def test_checkout_book(mock_get_books, mock_input, capsys):
+@patch("builtins.input", side_effect=["1"]) #input for the 1 input call
+@patch("backend.main.requests.get")
+@patch("backend.main.requests.put")
+def test_checkout_success(mock_put, mock_get, mock_input, mock_get_books, capsys):
     cli.token = "fake_token"
+    mock_get.return_value.status_code = 200    #simulates successful and current session
+    mock_put.return_value.status_code = 200    #simulates successful checkout
     cli.checkout_book()
     captured = capsys.readouterr()
     output = captured.out
@@ -187,7 +294,73 @@ def test_checkout_book(mock_get_books, mock_input, capsys):
     del cli.token
 
 
+@patch("backend.main.get_books")
+@patch("builtins.input", side_effect=["1"]) #input for the 1 input call
+@patch("backend.main.requests.get")
+@patch("backend.main.requests.put")
+def test_checkout_success(mock_put, mock_get, mock_input, mock_get_books, capsys):
+    cli.token = "fake_token"
+    mock_get.return_value.status_code = 401    #simulates expired session    #simulates successful checkout
+    cli.checkout_book()
+    captured = capsys.readouterr()
+    output = captured.out
+    assert "Session expired sign in again to checkout a book" in output
+    mock_get_books.assert_called_once()
+    del cli.token
+
+@patch("backend.main.get_books")
+@patch("builtins.input", side_effect=["1"]) #book id
+@patch("backend.main.requests.get")
+@patch("backend.main.requests.put")
+def test_checkout_already_checked_out(mock_put, mock_get, mock_input, mock_get_books, capsys):
+    cli.token = "fake_token"
+    mock_get.return_value.status_code = 200    #simulates valid session
+    mock_put.return_value.status_code = 400    #simulates book already checked out
+
+    cli.checkout_book()
+
+    captured = capsys.readouterr()
+    output = captured.out
+
+    assert "Book with ID 1 has already been checked out by another user" in output
+    mock_get_books.assert_called_once()
+    del cli.token
+
 #return_book
+@patch("backend.main.get_books")
+@patch("builtins.input", side_effect=["1"]) #input for the 1 input
+@patch("backend.main.requests.get")
+@patch("backend.main.requests.put")
+def test_return_book_success(mock_put, mock_get, mock_input, mock_get_books, capsys):
+    cli.token = "fake_token"
+    mock_get.return_value.status_code = 200    #simulates valid session
+    mock_put.return_value.status_code = 200    #simulates successful return
+
+    cli.return_book()
+    captured = capsys.readouterr()
+    output = captured.out
+    assert "Book with ID 1 was returned successfully!" in output
+    mock_get_books.assert_called_once()
+    del cli.token
+
+
+
+@patch("backend.main.get_books")
+@patch("builtins.input", side_effect=["1"]) #input for the 1 input
+@patch("backend.main.requests.get")
+@patch("backend.main.requests.put")
+def test_return_book_not_checked_out(mock_put, mock_get, mock_input, mock_get_books, capsys):
+    cli.token = "fake_token"
+    mock_get.return_value.status_code = 200    #simulates valid session
+    mock_put.return_value.status_code = 500    #simulates book not checked out by user
+
+    cli.return_book()
+    captured = capsys.readouterr()
+    output = captured.out
+    assert "Book with ID 1 hasn't been checked out by you" in output
+    mock_get_books.assert_called_once()
+    del cli.token
+
 
 #clear_screen
 
@@ -199,5 +372,3 @@ def test_clear_screen(mock_os):
     else:
         mock_os.assert_called_once_with("clear")
 
-
-#main?

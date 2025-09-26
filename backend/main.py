@@ -36,7 +36,7 @@ def check_login() -> None:
             global token
             token = f.read().strip()
             if token:
-                response = requests.get("https://lms.murtsa.dev/user", headers={"Authorization": token.strip('"')})
+                response = requests.get("https://lms.murtsa.dev/user", headers={"Authorization": token})
                 if response.status_code != 200:
                     os.remove("token.txt")
                     del token
@@ -73,7 +73,7 @@ def login() -> None:  # puts token in global scope
         # response = requests.post("http://127.0.0.1:8000/auth", data=payload)
         # for testing local server
         global token
-        token = response.text  # the request hits the server, but it returns an empty string
+        token = response.text.strip('"')  # the request hits the server, but it returns an empty string
         if response.status_code != 200:
             print(
                 f"Login failed. Status code {response.status_code} for reason {response.reason}. \nPlease check your credentials and try again.\n"
@@ -125,6 +125,7 @@ def signup():
         return
 
 def get_books():
+    clear_screen()
     response = requests.get('https://lms.murtsa.dev/books')
     # response = requests.get("http://127.0.0.1:8000/books")
 
@@ -137,24 +138,27 @@ def get_books():
         print(f"Error fetching books: {data['error']['message']}\n")
         return []
     books = data["data"]
+    print(f"\n{'-'*20} Books {'-'*20}\n")
     for book in books:
         print(
             f"\nTitle: {book['title']}, Author: {book['author']}, ISBN: {book['isbn']}, ID: {book['id']}"
         )
+    input("\nPress Enter to continue...")
 
 
 def add_book():
     title = input("Enter book title: ")
     author = input("Enter book author: ")
     isbn = input("Enter book ISBN: ")
-    headers = '{"Authorization": ' + token + ', "Content-Type": "application/json"}'
-    payload = '{"title": ' + title + ', "author": ' + author + ', "isbn": ' + isbn + "}"
+    headers = {"Authorization": token, "Content-Type": "application/json"}
+    payload = {"title":title, "author": author, "isbn": isbn }
     response = requests.put('https://lms.murtsa.dev/book', headers=headers, json=payload)
     # response = requests.put("http://127.0.0.1:8000/book", headers=headers, json=payload)
     if response.status_code != 200:
         print(
             f"Failed to add book. Status code: {response.status_code}, Response: {response.text}\n"
         )
+        input("Press Enter to continue...")
         return
     print("Book added successfully!\n")
     return
@@ -162,7 +166,7 @@ def add_book():
 
 def checkout_book():
     get_books()
-    headers = {"Authorization": token.strip('"'), "Content-Type": "application/json"}
+    headers = {"Authorization": token, "Content-Type": "application/json"}
 
     book_id = input("Enter the ID of the book you want to checkout: ")
     user_id = requests.get("https://lms.murtsa.dev/user", headers=headers)
@@ -184,7 +188,7 @@ def checkout_book():
 
 def return_book():
     get_books()
-    headers = {"Authorization": token.strip('"'), "Content-Type": "application/json"}
+    headers = {"Authorization": token, "Content-Type": "application/json"}
 
     book_id = input("Enter the ID of the book you want to return: ")
     user_id = requests.get("https://lms.murtsa.dev/user", headers=headers)
@@ -223,8 +227,8 @@ def main():
 
     try:
         # print("Please Choose an option:")
-        print_menu()
         while True:
+            print_menu()
             number = input("Enter your choice: ")
             match number:
                 case "0":

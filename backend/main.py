@@ -43,7 +43,7 @@ def is_logged_in() -> bool:
                     except Exception:
                         pass
                     del token
-                    raise Exception("Invalid token")
+                    return False
             print("Logged in using saved token.")
             return True
     except FileNotFoundError:

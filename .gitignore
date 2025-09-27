@@ -3,4 +3,4 @@ backend/.idea/
 backend/__pycache__/
 frontend/.idea/
 .idea/
-
+token.txt

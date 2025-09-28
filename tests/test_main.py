@@ -1,6 +1,9 @@
 #this is a place-holder file
 
 import sys
+
+sys.path.insert(0, "../backend")  # Adjust the path as necessary
+
 import os
 import pytest
 from fastapi.testclient import TestClient
@@ -134,7 +137,7 @@ def test_login_failure_unauthorized(mock_post, mock_pass, mock_input, capsys, tm
     assert "Login failed. Status code 401 for reason Unauthorized." in output
     assert "Please check your credentials and try again." in output
 
-@patch("builtins.input", side_effect=["milesdavis@gmail.com", "n"]) #mock input for email; n for retry
+@patch("builtins.input", side_effect=["milesdavis@gmail.com", "n"]) # Mock input for email; n for retry
 @patch("backend.main.maskpass.askpass", return_value="ihatetrumpets")
 @patch("backend.main.requests.post")
 @patch("backend.main.requests.get")
@@ -181,11 +184,11 @@ def test_signup_failure(mock_post, mock_pass, mock_input, capsys):
 
 
 #get_books
+
 @patch('backend.main.requests.get')
-def test_get_books(mock_get, capsys):
-    mock_response = MagicMock()
-    mock_response.status_code = 200
-    mock_response.json.return_value = {
+@patch("builtins.input", return_value="") # Mock input for exiting function
+def test_print_books_success(mock_input, mock_get, capsys):
+    mock_get.return_value.json.return_value = {
         "data": [
             {
                 "id": 1,
@@ -207,8 +210,7 @@ def test_get_books(mock_get, capsys):
             }
         ]
     }
-    mock_get.return_value = mock_response
-    books = cli.get_books()
+    cli.print_books()
     captured = capsys.readouterr()
     output = captured.out
     assert "Book 1" in output
@@ -222,16 +224,20 @@ def test_get_books(mock_get, capsys):
     assert "Frank Herbert" in output
 
 
-@patch('backend.main.requests.get')
-def test_get_books_empty(mock_get, capsys):
-    mock_response = MagicMock()
-    mock_response.status_code = 200
-    mock_response.json.return_value = {"data": []}
-    mock_get.return_value = mock_response
-    books = cli.get_books()
+@patch("backend.main.requests.get")
+@patch("builtins.input", return_value="") # Mock input for exiting function
+def test_print_books_empty(mock_input, mock_get, capsys):
+    mock_get.return_value.json.return_value = {"data": []}
+    cli.print_books()
     captured = capsys.readouterr()
     output = captured.out
-    assert books == None
+    assert "Books" in output # This should be the only output
+    assert "Title" not in output  # No books should be printed
+    assert "Author" not in output
+    assert "ISBN" not in output
+    assert "ID" not in output
+
+
 
 
 
@@ -252,7 +258,7 @@ def test_add_book(mock_put, mock_input, capsys):
     del cli.token  # reset token for later tests
 
 
-@patch("builtins.input", side_effect=["Atlas Shrugged", "Ayn Rand", "123-456"]) #input for the 3 input calls
+@patch("builtins.input", side_effect=["Atlas Shrugged", "Ayn Rand", "123-456", ""]) #input for the 3 input calls + exiting function
 @patch("backend.main.requests.put")
 def test_add_book_500(mock_put, mock_input, capsys):
     cli.token = "fake_token"
@@ -268,91 +274,128 @@ def test_add_book_500(mock_put, mock_input, capsys):
 
 
 
-
-
 #checkout_book
-@patch("backend.main.get_books")
+@patch("backend.main.print_books")
 @patch("builtins.input", side_effect=["1"]) #input for the 1 input call
-@patch("backend.main.requests.get")
 @patch("backend.main.requests.put")
-def test_checkout_success(mock_put, mock_get, mock_input, mock_get_books, capsys):
+@patch("backend.main.requests.get")
+def test_checkout_success(mock_get, mock_put, mock_input, mock_print_books, capsys):
     cli.token = "fake_token"
+
     mock_get.return_value.status_code = 200    #simulates successful and current session
+    mock_get.return_value.text = "ctack321"
+
     mock_put.return_value.status_code = 200    #simulates successful checkout
+    mock_put.return_value.text = "Checkout successful"  #simulated return response from server
+
     cli.checkout_book()
+
     captured = capsys.readouterr()
     output = captured.out
-    assert "Book with ID 1 checked out successfully!" in output
-    mock_get_books.assert_called_once()
+    assert "Checkout successful" in output
+    mock_print_books.assert_called_once()
     del cli.token
 
 
-@patch("backend.main.get_books")
+@patch("backend.main.print_books")
 @patch("builtins.input", side_effect=["1"]) #input for the 1 input call
 @patch("backend.main.requests.get")
 @patch("backend.main.requests.put")
-def test_checkout_success(mock_put, mock_get, mock_input, mock_get_books, capsys):
+def test_checkout_expired(mock_put, mock_get, mock_input, mock_print_books, capsys):
     cli.token = "fake_token"
-    mock_get.return_value.status_code = 401    #simulates expired session    #simulates successful checkout
+
+    mock_get.return_value.status_code = 401#simulates expired session
     cli.checkout_book()
+
     captured = capsys.readouterr()
     output = captured.out
     assert "Session expired sign in again to checkout a book" in output
-    mock_get_books.assert_called_once()
+    mock_print_books.assert_called_once()
     del cli.token
 
-@patch("backend.main.get_books")
+
+@patch("backend.main.print_books")
 @patch("builtins.input", side_effect=["1"]) #book id
 @patch("backend.main.requests.get")
 @patch("backend.main.requests.put")
-def test_checkout_already_checked_out(mock_put, mock_get, mock_input, mock_get_books, capsys):
+def test_checkout_already_checked_out(mock_put, mock_get, mock_input, mock_print_books, capsys):
     cli.token = "fake_token"
+
     mock_get.return_value.status_code = 200    #simulates valid session
+    mock_get.return_value.text = "ctack321"
+
     mock_put.return_value.status_code = 400    #simulates book already checked out
+    mock_put.return_value.text = "This book is not currently available for checkout."
 
     cli.checkout_book()
 
     captured = capsys.readouterr()
     output = captured.out
 
-    assert "Book with ID 1 has already been checked out by another user" in output
-    mock_get_books.assert_called_once()
+    assert "Failed to checkout book. Status code: 400, Response: This book is not currently available for checkout" in output
+    mock_print_books.assert_called_once()
     del cli.token
 
 #return_book
-@patch("backend.main.get_books")
+@patch("backend.main.print_books")
 @patch("builtins.input", side_effect=["1"]) #input for the 1 input
 @patch("backend.main.requests.get")
 @patch("backend.main.requests.put")
-def test_return_book_success(mock_put, mock_get, mock_input, mock_get_books, capsys):
+def test_return_book_success(mock_put, mock_get, mock_input, mock_print_books, capsys):
     cli.token = "fake_token"
+
     mock_get.return_value.status_code = 200    #simulates valid session
+
     mock_put.return_value.status_code = 200    #simulates successful return
+    mock_put.return_value.text = "Book with ID 1 was returned successfully!"
 
     cli.return_book()
+
     captured = capsys.readouterr()
     output = captured.out
     assert "Book with ID 1 was returned successfully!" in output
-    mock_get_books.assert_called_once()
+    mock_print_books.assert_called_once()
     del cli.token
 
-
-
-@patch("backend.main.get_books")
+@patch("backend.main.print_books")
 @patch("builtins.input", side_effect=["1"]) #input for the 1 input
 @patch("backend.main.requests.get")
 @patch("backend.main.requests.put")
-def test_return_book_not_checked_out(mock_put, mock_get, mock_input, mock_get_books, capsys):
+def test_return_book_invalid_session(mock_put, mock_get, mock_input, mock_print_books, capsys):
     cli.token = "fake_token"
-    mock_get.return_value.status_code = 200    #simulates valid session
-    mock_put.return_value.status_code = 500    #simulates book not checked out by user
+
+    mock_get.return_value.status_code = 401    #invalid session
+
 
     cli.return_book()
+
     captured = capsys.readouterr()
     output = captured.out
-    assert "Book with ID 1 hasn't been checked out by you" in output
-    mock_get_books.assert_called_once()
+    assert "Session expired sign in again to return a book" in output
+    mock_print_books.assert_called_once()
     del cli.token
+
+
+
+@patch("backend.main.print_books")
+@patch("builtins.input", side_effect=["1"]) #input for the 1 input
+@patch("backend.main.requests.get")
+@patch("backend.main.requests.put")
+def test_return_book_failure(mock_put, mock_get, mock_input, mock_print_books, capsys):
+    cli.token = "fake_token"
+
+    mock_get.return_value.status_code = 200    #simulates valid session
+    mock_put.return_value.status_code = 500    #simulates invalid return (e.g. book wasn't checked out by this user)
+    mock_put.return_value.text = "Book with ID 1 hasn't been checked out by you"
+
+    cli.return_book()
+
+    captured = capsys.readouterr()
+    output = captured.out
+    assert "Failed to return book. Status code: 500, Response: Book with ID 1 hasn't been checked out by you" in output
+    mock_print_books.assert_called_once()
+    del cli.token
+
 
 
 #clear_screen

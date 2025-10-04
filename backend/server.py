@@ -52,6 +52,7 @@ def get_books():
     response = (supabase.table("books").select("*").execute())
     return response
 
+
 @app.post("/signup")
 async def signup(request: Request):
     """Creates a new user in the database"""
@@ -63,6 +64,14 @@ async def signup(request: Request):
     supabase_service_client.table("users").insert({"supabase_id": supabase_id}).execute()
 
     return "User created successfully"
+
+
+@app.post("/logout")
+async def logout():
+    """Logs the current user out"""
+    supabase.auth.sign_out()
+
+    return "Logged out successfully"
 
 
 @app.get("/user")
@@ -106,7 +115,7 @@ async def create_book(request: Request):
 
 
 @app.put("/checkout")
-async def create_book(request: Request):
+async def checkout_book(request: Request):
     """Checks out a book in the database"""
     data = await request.json()
     auth_token = request.headers["Authorization"]
@@ -125,7 +134,7 @@ async def create_book(request: Request):
 
 
 @app.put("/return")
-async def create_book(request: Request):
+async def return_book(request: Request):
     """Returns a book in the database"""
     data = await request.json()
     auth_token = request.headers["Authorization"]
@@ -134,7 +143,7 @@ async def create_book(request: Request):
 
     # queries
     is_checked_out = "SELECT * FROM checkout_logs WHERE checkin_date IS NULL AND book_id = :book_id AND user_id = :user_id"
-    return_book = "UPDATE checkout_logs SET checkin_date = :current_date where checkin_date IS NULL AND book_id = :book_id AND user_id = :user_id"
+    checkin_book = "UPDATE checkout_logs SET checkin_date = :current_date where checkin_date IS NULL AND book_id = :book_id AND user_id = :user_id"
 
     with engine.connect() as connection:
         result = connection.execute(text(is_checked_out), {"book_id": data["book_id"], "user_id": data["user_id"]})
@@ -142,8 +151,8 @@ async def create_book(request: Request):
             response = "This book isn't currently checked out by you"
         else:
             supabase.table("books").update({"is_checked_out": False}).eq("id", data["book_id"]).execute()
-            connection.execute(text(return_book), {"book_id": data["book_id"], "user_id": data["user_id"],
-                                                   "current_date": current_date.strftime('%Y-%m-%d %H:%M:%S %z')})
+            connection.execute(text(checkin_book), {"book_id": data["book_id"], "user_id": data["user_id"],
+                                                    "current_date": current_date.strftime('%Y-%m-%d %H:%M:%S %z')})
             connection.commit()
             response = "Book successfully returned"
 

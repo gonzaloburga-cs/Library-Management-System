@@ -12,6 +12,7 @@ sleep_time = 2  # seconds
 
 # functions
 def print_menu() -> None:
+    """Prints the main menu."""
     clear_screen()
     print("Library Management System Menu")
     print("0. Show Menu")
@@ -29,10 +30,12 @@ def print_menu() -> None:
 
 
 def hello_world():
+    """Test function to check server connectivity."""
     message = server.hello_world()
     print(message["message"])
 
 def is_logged_in() -> bool:
+    """Check if user is logged in by looking for a saved token."""
     try:  # Basic token persistence
         with open("token.txt", "r") as f:
             global token
@@ -52,7 +55,7 @@ def is_logged_in() -> bool:
         return False
 
 def login() -> None:  # puts token in global scope
-    
+    """Logs in the user and saves the token to a file."""
     if is_logged_in():
         return
     
@@ -96,6 +99,7 @@ def login() -> None:  # puts token in global scope
     print("Login successful!")
 
 def logout() -> None:
+    """Logs out the user and deletes the saved token."""
     global token  # to modify the global token variable
     server.supabase.auth.sign_out()
     # server.supabase.auth.admin.sign_out(token.strip('"'))
@@ -104,6 +108,7 @@ def logout() -> None:
 
 
 def signup() -> None:
+    """Signs up a new user."""
     email = input("Enter your email: ")
     password = maskpass.askpass("Enter your password: ")
     payload = '{"email": "' + email + '", "password": "' + password + '"}'
@@ -117,6 +122,7 @@ def signup() -> None:
         return
 
 def print_books() -> None:
+    """Fetches and prints the list of books from the server."""
     clear_screen()
     response = requests.get('https://lms.murtsa.dev/books')
     # response = requests.get("http://127.0.0.1:8000/books")
@@ -139,6 +145,7 @@ def print_books() -> None:
 
 
 def add_book() -> None:
+    """Adds a new book to the library."""
     title = input("Enter book title: ")
     author = input("Enter book author: ")
     isbn = input("Enter book ISBN: ")
@@ -158,6 +165,7 @@ def add_book() -> None:
 
 
 def checkout_book() -> None:
+    """Checks out a book for the logged-in user."""
     print_books()
     headers = {"Authorization": token, "Content-Type": "application/json"}
 
@@ -182,6 +190,7 @@ def checkout_book() -> None:
 
 
 def return_book() -> None:
+    """Returns a book for the logged-in user."""
     print_books()
     headers = {"Authorization": token, "Content-Type": "application/json"}
 
@@ -206,6 +215,7 @@ def return_book() -> None:
 
 
 def clear_screen() -> None:
+    """Clears the terminal screen."""
     if os.name == "nt":
         os.system("cls")  # for windows
     else:
@@ -216,7 +226,7 @@ def clear_screen() -> None:
 
 # main
 def main():
-    
+    """Main function to run the Library Management System."""
     
     if is_logged_in():
         pass

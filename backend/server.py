@@ -27,6 +27,7 @@ supabase_service_client = create_client(os.getenv("SUPABASE_URL"), os.getenv("SU
 
 
 def get_db_session():
+    """Dependency to get a database session."""
     db = SessionLocal()
     try:
         yield db
@@ -40,17 +41,20 @@ app = FastAPI()
 # Used to test if the server is running
 @app.get("/")
 def hello_world():
+    """Test function to check server connectivity."""
     return {"message": "Hello World"}
 
 
 # Return a list of books
 @app.get("/books")
 def get_books():
+    """Return a list of books"""
     response = (supabase.table("books").select("*").execute())
     return response
 
 @app.post("/signup")
 async def signup(request: Request):
+    """Creates a new user in the database"""
     data = await request.json()
 
     create_user = supabase.auth.sign_up({"email": data["email"], "password": data["password"]})
@@ -63,6 +67,7 @@ async def signup(request: Request):
 
 @app.get("/user")
 async def get_user(request: Request):
+    """Returns the user id of the user whose auth token was provided"""
     auth_token = request.headers["Authorization"]
     user = supabase.auth.get_user(auth_token)
     response = user.user.id
@@ -73,6 +78,7 @@ async def get_user(request: Request):
 # Returns a temporary auth token of the user whose credentials were provided
 @app.post("/auth")
 async def post_auth(request: Request):
+    """Returns a temporary auth token of the user whose credentials were provided"""
     data = await request.json()
     auth = supabase.auth.sign_in_with_password({"email": data["email"], "password": data["password"]})
     session = auth.session
@@ -85,6 +91,7 @@ async def post_auth(request: Request):
 #  increment quantity (column needs to be added to database)
 @app.put("/book")
 async def create_book(request: Request):
+    """Creates a new book in the database"""
     data = await request.json()
     auth_token = request.headers["Authorization"]
 
@@ -100,6 +107,7 @@ async def create_book(request: Request):
 
 @app.put("/checkout")
 async def create_book(request: Request):
+    """Checks out a book in the database"""
     data = await request.json()
     auth_token = request.headers["Authorization"]
     supabase.postgrest.auth(auth_token)
@@ -118,6 +126,7 @@ async def create_book(request: Request):
 
 @app.put("/return")
 async def create_book(request: Request):
+    """Returns a book in the database"""
     data = await request.json()
     auth_token = request.headers["Authorization"]
     current_date = datetime.now(timezone.utc)

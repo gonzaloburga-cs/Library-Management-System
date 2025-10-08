@@ -28,10 +28,19 @@ class MainWindow(QMainWindow):
         main_layout.setContentsMargins(0, 0, 0, 0)
         main_layout.setSpacing(0)
 
-        # Header
+        # Header Layout
         self.header = QHBoxLayout()
         self.header.setContentsMargins(10, 10, 10, 10)
         self.header.setSpacing(20)
+
+        # stacked layout
+        self.stacked_layout = QStackedLayout()
+        self.stacked_layout.setContentsMargins(10, 10, 10, 10)
+        self.stacked_layout.setSpacing(20)
+
+        # Add layouts to main
+        main_layout.addLayout(self.header)
+        main_layout.addLayout(self.stacked_layout)
 
         # label
         self.header_label = QLabel("Library Management System")
@@ -39,37 +48,29 @@ class MainWindow(QMainWindow):
         self.header_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.header_label.setFixedHeight(50)
         self.header_label.setStyleSheet("color: white;")
-        self.header.addWidget(self.header_label)
 
         # Search box
         self.searchbox = QTextEdit()
-        self.searchbox.setPlaceholderText("Search for books...")
+        self.searchbox.setPlaceholderText("Search...")
         self.searchbox.setGeometry(50, 50, 2, 400)
         self.searchbox.setFixedHeight(30)
         self.searchbox.setFixedWidth(200)
         self.searchbox.setStyleSheet("background-color: white;")
-        self.header.addWidget(self.searchbox)
-        main_layout.addLayout(self.header)
-
-        # stacked layout
-        self.stacked_layout = QStackedLayout()
-        self.stacked_layout.setContentsMargins(10, 10, 10, 10)
-        self.stacked_layout.setSpacing(20)
-        main_layout.addLayout(self.stacked_layout)
 
         # Navigation bar
         self.tabs = QTabWidget()
-
+        # Home Button
         self.home_button = QPushButton("Home")
         self.home_button.setStyleSheet("background-color: white; color: black;")
         self.home_button.clicked.connect(self.clicked_home)
-
+        # My Books button
         self.books_button = QPushButton("My Books")
         self.books_button.setStyleSheet("background-color: #b29c82; color: white;")
         self.books_button.clicked.connect(self.clicked_books)
 
         self.change_button_colors()
 
+        # Login Button
         if self.is_logged_in():
             self.login_button = QPushButton("Logout")
             self.login_button.clicked.connect(self.clicked_logout)
@@ -77,20 +78,13 @@ class MainWindow(QMainWindow):
             self.login_button = QPushButton("Login")
             self.login_button.clicked.connect(self.clicked_login)
         self.login_button.setStyleSheet("color: white;")
+
+        # add widgets to header
+        self.header.addWidget(self.header_label)
+        self.header.addWidget(self.searchbox)
         self.header.addWidget(self.home_button)
         self.header.addWidget(self.books_button)
         self.header.addWidget(self.login_button)
-
-        # Book list layout
-        book_list_layout = QHBoxLayout()
-        book_list_layout.setContentsMargins(10, 10, 10, 10)
-        book_list_layout.setSpacing(20)
-        # main_layout.addLayout(book_list_layout)
-
-        # Add a label
-        # label = QLabel("Hello, World!")
-        # label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        # book_list_layout.addWidget(label)
 
         # Table of books
         books = self.get_books()
@@ -141,7 +135,7 @@ class MainWindow(QMainWindow):
             self.return_button = QPushButton("Return")
             self.return_button.setStyleSheet("background-color: black; color: white;")
             self.return_button.setProperty("book_id", book["id"])
-            # self.return_button.clicked.connect(self.clicked_return)
+            self.return_button.clicked.connect(self.clicked_return)
             self.my_books_table.setCellWidget(i, 3, self.return_button)
 
         self.my_books_table.resizeColumnsToContents()
@@ -195,11 +189,34 @@ class MainWindow(QMainWindow):
         if self.stacked_layout.currentIndex() == 0:
             self.home_button.setStyleSheet("background-color: white; color: black")
             self.books_button.setStyleSheet("color: white")
-        else:
+        elif self.stacked_layout.currentIndex() == 1:
             self.home_button.setStyleSheet("background-color: #b29c82; color: white")
             self.books_button.setStyleSheet("background-color: white; color: black")
 
-    # click events
+    def update_book_list(self):
+        books = self.get_books()
+        for i, book in enumerate(books):
+            self.books_table.setItem(i, 0, QTableWidgetItem(f"Book {book["title"]}"))
+            self.books_table.setItem(i, 1, QTableWidgetItem(f"Author {book["author"]}"))
+            self.books_table.setItem(i, 2, QTableWidgetItem(f"{book["isbn"]}"))
+            if book["is_checked_out"] == True:
+                self.checkout_button = QPushButton("unavailable")
+                self.checkout_button.setEnabled(False)
+                self.checkout_button.setStyleSheet(
+                    "background-color: red; color: white;"
+                )
+                self.books_table.setCellWidget(i, 3, self.checkout_button)
+            else:
+                self.checkout_button = QPushButton("Check Out")
+                self.checkout_button.setEnabled(True)
+                self.checkout_button.setStyleSheet(
+                    "background-color: black; color: white;"
+                )
+                self.checkout_button.setProperty("book_id", book["id"])
+                self.checkout_button.clicked.connect(self.clicked_checkout)
+                self.books_table.setCellWidget(i, 3, self.checkout_button)
+
+    # event handlers
 
     def clicked_login(self):
         if self.is_logged_in():
@@ -211,6 +228,7 @@ class MainWindow(QMainWindow):
 
         self.login_dialog = LoginDialog()
         self.login_dialog.show()
+        self.is_logged_in()
         return
 
     def clicked_logout(self):
@@ -229,8 +247,8 @@ class MainWindow(QMainWindow):
             )
             return
         headers = {"Authorization": token, "Content-Type": "application/json"}
-        sender_id = QObject.sender()
-        book_id = sender_id
+        sender = self.sender()
+        book_id = sender.property("book_id")
         user_id = requests.get("https://lms.murtsa.dev/user", headers=headers)
         # user_id = requests.get("http://127.0.0.1:8000/user", headers=headers)
 
@@ -246,11 +264,42 @@ class MainWindow(QMainWindow):
         )
         # response = requests.put('http://127.0.0.1:8000/checkout', headers=headers, json=payload)
         if response.status_code == 200:
-            QMessageBox.information(self, response.text.strip('"'))
+            QMessageBox.information(self, "Info", response.text.strip('"'))
+            self.update_book_list()
         else:
             QMessageBox.warning(
                 self, "Error", "Failed to checkout book. {response.text}"
             )
+        return
+
+    def clicked_return(self):
+        """Returns a book for the logged-in user."""
+        headers = {"Authorization": token, "Content-Type": "application/json"}
+        sender = self.sender()
+        book_id = sender.property("book_id")
+        user_id = requests.get("https://lms.murtsa.dev/user", headers=headers)
+        # user_id = requests.get('http://127.0.0.1:8000/user', headers=headers)
+        if user_id.status_code != 200:
+            QMessageBox.warning(
+                self, "Error", "Session expired sign in again to return a book"
+            )
+            return
+
+        payload = {"book_id": book_id, "user_id": user_id.text.strip('"')}
+        response = requests.put(
+            "https://lms.murtsa.dev/return", headers=headers, json=payload
+        )
+        # response = requests.put('http://127.0.0.1:8000/return', headers=headers, json=payload)
+        if response.status_code == 200:
+            QMessageBox.information(self, "Info", response.text.strip('"'))
+            self.update_book_list()
+        else:
+            QMessageBox.warning(
+                self,
+                "Error",
+                f"\nFailed to return book. Status code: {response.status_code}, Response: {response.text}\n",
+            )
+
         return
 
     def clicked_home(self):

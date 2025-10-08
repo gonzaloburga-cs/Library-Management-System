@@ -38,6 +38,7 @@ class MainWindow(QMainWindow):
         self.header_label.setFont(QFont("Arial", 24))
         self.header_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.header_label.setFixedHeight(50)
+        self.header_label.setStyleSheet("color: white;")
         self.header.addWidget(self.header_label)
 
         # Search box

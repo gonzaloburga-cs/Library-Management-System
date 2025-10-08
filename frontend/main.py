@@ -23,6 +23,7 @@ class MainWindow(QMainWindow):
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
 
+        # Main Layout
         main_layout = QVBoxLayout()
         central_widget.setLayout(main_layout)
         main_layout.setContentsMargins(0, 0, 0, 0)
@@ -42,6 +43,7 @@ class MainWindow(QMainWindow):
         main_layout.addLayout(self.header)
         main_layout.addLayout(self.stacked_layout)
 
+        ## Widgets
         # label
         self.header_label = QLabel("Library Management System")
         self.header_label.setFont(QFont("Arial", 24))
@@ -93,8 +95,8 @@ class MainWindow(QMainWindow):
         self.books_table.setColumnCount(4)
         self.books_table.setHorizontalHeaderLabels(["Title", "Author", "ISBN", " "])
         for i, book in enumerate(books):
-            self.books_table.setItem(i, 0, QTableWidgetItem(f"Book {book["title"]}"))
-            self.books_table.setItem(i, 1, QTableWidgetItem(f"Author {book["author"]}"))
+            self.books_table.setItem(i, 0, QTableWidgetItem(f"{book["title"]}"))
+            self.books_table.setItem(i, 1, QTableWidgetItem(f"{book["author"]}"))
             self.books_table.setItem(i, 2, QTableWidgetItem(f"{book["isbn"]}"))
             if book["is_checked_out"] == True:
                 self.checkout_button = QPushButton("unavailable")
@@ -116,8 +118,6 @@ class MainWindow(QMainWindow):
         self.books_table.resizeColumnsToContents()
         self.books_table.resizeRowsToContents()
 
-        self.stacked_layout.addWidget(self.books_table)
-
         # Checked out books
         books = self.get_books()
         self.my_books_table = QTableWidget()
@@ -127,10 +127,8 @@ class MainWindow(QMainWindow):
             ["Title", "Author", "Due Date", " "]
         )
         for i, book in enumerate(books):
-            self.my_books_table.setItem(i, 0, QTableWidgetItem(f"Book {book["title"]}"))
-            self.my_books_table.setItem(
-                i, 1, QTableWidgetItem(f"Author {book["author"]}")
-            )
+            self.my_books_table.setItem(i, 0, QTableWidgetItem(f"{book["title"]}"))
+            self.my_books_table.setItem(i, 1, QTableWidgetItem(f"{book["author"]}"))
             self.my_books_table.setItem(i, 2, QTableWidgetItem(f"{book["isbn"]}"))
             self.return_button = QPushButton("Return")
             self.return_button.setStyleSheet("background-color: black; color: white;")
@@ -141,6 +139,8 @@ class MainWindow(QMainWindow):
         self.my_books_table.resizeColumnsToContents()
         self.my_books_table.resizeRowsToContents()
 
+        # Add widgets to stacked layout
+        self.stacked_layout.addWidget(self.books_table)
         self.stacked_layout.addWidget(self.my_books_table)
 
     # methods
@@ -240,7 +240,7 @@ class MainWindow(QMainWindow):
         self.login_button.clicked.connect(self.clicked_login)
         QMessageBox.information(self, "Info", "You are logged out")
 
-    def clicked_checkout(self):  # Untested code from cli
+    def clicked_checkout(self):
         if not self.is_logged_in():
             QMessageBox.warning(
                 self, "Error", "You must be logged in to checkout a book"

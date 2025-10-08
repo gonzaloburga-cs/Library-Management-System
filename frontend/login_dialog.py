@@ -65,6 +65,7 @@ class LoginDialog(QDialog):
         except Exception as e:
             QMessageBox.warning(self, "Error", f"Failed to save token to file: {e}")
         QMessageBox.information(self, "success", "Login successful!")
+        self.destroy()
 
     def clicked_logout(self):
         global token  # to modify the global token variable

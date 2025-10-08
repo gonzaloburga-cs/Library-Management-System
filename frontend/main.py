@@ -152,19 +152,24 @@ class MainWindow(QMainWindow):
 
     def clicked_login(self):
         if self.is_logged_in():
-            QMessageBox.information(self, "Info", "You are already logged in")
+            QMessageBox.information(self, "Info", "You have been logged in")
             self.login_button.setText("Logout")
-            self.login_button.clicked.connect()
+            self.login_button.clicked.disconnect()
+            self.login_button.clicked.connect(self.clicked_logout)
             return
 
         self.login_dialog = LoginDialog()
+        self.login_dialog.show()
         return
 
     def clicked_logout(self):
         global token
         # response = requests.post("https://lms.murtsa.dev/auth", data=token)
         del token
-        QMessageBox.information(self, "Error", "You are logged out")
+        self.login_button.setText("Login")
+        self.login_button.clicked.disconnect()
+        self.login_button.clicked.connect(self.clicked_login)
+        QMessageBox.information(self, "Info", "You are logged out")
 
     def clicked_checkout(self):  # Untested code from cli
         if not self.is_logged_in():

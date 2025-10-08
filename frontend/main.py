@@ -17,6 +17,7 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
         self.setWindowTitle("Library Management System")
         self.setGeometry(100, 100, self.window_width, self.window_height)
+        self.setStyleSheet("background-color: #b29c82")
 
         # Create a central widget
         central_widget = QWidget()
@@ -45,20 +46,36 @@ class MainWindow(QMainWindow):
         self.searchbox.setGeometry(50, 50, 2, 400)
         self.searchbox.setFixedHeight(30)
         self.searchbox.setFixedWidth(200)
+        self.searchbox.setStyleSheet("background-color: white;")
         self.header.addWidget(self.searchbox)
         main_layout.addLayout(self.header)
+
+        # stacked layout
+        self.stacked_layout = QStackedLayout()
+        self.stacked_layout.setContentsMargins(10, 10, 10, 10)
+        self.stacked_layout.setSpacing(20)
+        main_layout.addLayout(self.stacked_layout)
 
         # Navigation bar
         self.tabs = QTabWidget()
 
         self.home_button = QPushButton("Home")
+        self.home_button.setStyleSheet("background-color: white; color: black;")
+        self.home_button.clicked.connect(self.clicked_home)
+
         self.books_button = QPushButton("My Books")
+        self.books_button.setStyleSheet("background-color: #b29c82; color: white;")
+        self.books_button.clicked.connect(self.clicked_books)
+
+        self.change_button_colors()
+
         if self.is_logged_in():
             self.login_button = QPushButton("Logout")
             self.login_button.clicked.connect(self.clicked_logout)
         else:
             self.login_button = QPushButton("Login")
             self.login_button.clicked.connect(self.clicked_login)
+        self.login_button.setStyleSheet("color: white;")
         self.header.addWidget(self.home_button)
         self.header.addWidget(self.books_button)
         self.header.addWidget(self.login_button)
@@ -67,7 +84,7 @@ class MainWindow(QMainWindow):
         book_list_layout = QHBoxLayout()
         book_list_layout.setContentsMargins(10, 10, 10, 10)
         book_list_layout.setSpacing(20)
-        main_layout.addLayout(book_list_layout)
+        # main_layout.addLayout(book_list_layout)
 
         # Add a label
         # label = QLabel("Hello, World!")
@@ -104,7 +121,32 @@ class MainWindow(QMainWindow):
         self.books_table.resizeColumnsToContents()
         self.books_table.resizeRowsToContents()
 
-        book_list_layout.addWidget(self.books_table)
+        self.stacked_layout.addWidget(self.books_table)
+
+        # Checked out books
+        books = self.get_books()
+        self.my_books_table = QTableWidget()
+        self.my_books_table.setRowCount(len(books))
+        self.my_books_table.setColumnCount(4)
+        self.my_books_table.setHorizontalHeaderLabels(
+            ["Title", "Author", "Due Date", " "]
+        )
+        for i, book in enumerate(books):
+            self.my_books_table.setItem(i, 0, QTableWidgetItem(f"Book {book["title"]}"))
+            self.my_books_table.setItem(
+                i, 1, QTableWidgetItem(f"Author {book["author"]}")
+            )
+            self.my_books_table.setItem(i, 2, QTableWidgetItem(f"{book["isbn"]}"))
+            self.return_button = QPushButton("Return")
+            self.return_button.setStyleSheet("background-color: black; color: white;")
+            self.return_button.setProperty("book_id", book["id"])
+            # self.return_button.clicked.connect(self.clicked_return)
+            self.my_books_table.setCellWidget(i, 3, self.return_button)
+
+        self.my_books_table.resizeColumnsToContents()
+        self.my_books_table.resizeRowsToContents()
+
+        self.stacked_layout.addWidget(self.my_books_table)
 
     # methods
     def get_books(self) -> list:
@@ -148,6 +190,14 @@ class MainWindow(QMainWindow):
         except FileNotFoundError:
             return False
 
+    def change_button_colors(self):
+        if self.stacked_layout.currentIndex() == 0:
+            self.home_button.setStyleSheet("background-color: white; color: black")
+            self.books_button.setStyleSheet("color: white")
+        else:
+            self.home_button.setStyleSheet("background-color: #b29c82; color: white")
+            self.books_button.setStyleSheet("background-color: white; color: black")
+
     # click events
 
     def clicked_login(self):
@@ -178,8 +228,8 @@ class MainWindow(QMainWindow):
             )
             return
         headers = {"Authorization": token, "Content-Type": "application/json"}
-
-        book_id = QObject.sender()["book_id"]
+        sender_id = QObject.sender()
+        book_id = sender_id
         user_id = requests.get("https://lms.murtsa.dev/user", headers=headers)
         # user_id = requests.get("http://127.0.0.1:8000/user", headers=headers)
 
@@ -201,6 +251,14 @@ class MainWindow(QMainWindow):
                 self, "Error", "Failed to checkout book. {response.text}"
             )
         return
+
+    def clicked_home(self):
+        self.stacked_layout.setCurrentIndex(0)
+        self.change_button_colors()
+
+    def clicked_books(self):
+        self.stacked_layout.setCurrentIndex(1)
+        self.change_button_colors()
 
 
 def main():

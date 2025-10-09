@@ -59,6 +59,8 @@ class MainWindow(QMainWindow):
         self.searchbox.setFixedHeight(30)
         self.searchbox.setFixedWidth(200)
         self.searchbox.setStyleSheet("background-color: white;")
+        self.searchbox.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
+        self.searchbox.setMaximumBlockCount(1)
 
         # Navigation bar
         self.tabs = QTabWidget()

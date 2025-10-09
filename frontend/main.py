@@ -52,7 +52,7 @@ class MainWindow(QMainWindow):
         self.header_label.setStyleSheet("color: white;")
 
         # Search box
-        self.searchbox = QTextEdit()
+        self.searchbox = QPlainTextEdit()
         self.searchbox.setPlaceholderText("Search...")
         self.searchbox.setGeometry(50, 50, 2, 400)
         self.searchbox.setFixedHeight(30)
@@ -117,6 +117,8 @@ class MainWindow(QMainWindow):
 
         self.books_table.resizeColumnsToContents()
         self.books_table.resizeRowsToContents()
+        self.books_table.setSortingEnabled(True)
+        self.books_table.sortByColumn(0, Qt.SortOrder(0))
 
         # Checked out books
         books = self.get_books()
@@ -138,10 +140,14 @@ class MainWindow(QMainWindow):
 
         self.my_books_table.resizeColumnsToContents()
         self.my_books_table.resizeRowsToContents()
+        self.my_books_table.setSortingEnabled(True)
+        self.my_books_table.sortByColumn(0, Qt.SortOrder(0))
 
         # Add widgets to stacked layout
         self.stacked_layout.addWidget(self.books_table)
         self.stacked_layout.addWidget(self.my_books_table)
+
+        self.searchbox.textChanged.connect(self.changed_search)
 
     # methods
     def get_books(self) -> list:
@@ -217,6 +223,24 @@ class MainWindow(QMainWindow):
                 self.books_table.setCellWidget(i, 3, self.checkout_button)
 
     # event handlers
+
+    def changed_search(self):
+        text = self.searchbox.toPlainText()
+        if text == "":
+            self.books_table.setCurrentItem(None)
+            self.my_books_table.setCurrentItem(None)
+
+        matching_items1 = self.books_table.findItems(text, Qt.MatchFlag.MatchContains)
+        if matching_items1:
+            # we have found something
+            item = matching_items1[0]  # take the first
+            self.books_table.setCurrentItem(item)
+        matching_items2 = self.my_books_table.findItems(
+            text, Qt.MatchFlag.MatchContains
+        )
+        if matching_items2:
+            item = matching_items2[0]
+            self.my_books_table.setCurrentItem(item)
 
     def clicked_login(self):
         if self.is_logged_in():

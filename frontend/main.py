@@ -17,7 +17,7 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
         self.setWindowTitle("Library Management System")
         self.setGeometry(100, 100, self.window_width, self.window_height)
-        self.setStyleSheet("background-color: #b29c82")
+        self.setStyleSheet("background-color: #b29c82; border-radius: 8px;")
 
         # Create a central widget
         central_widget = QWidget()

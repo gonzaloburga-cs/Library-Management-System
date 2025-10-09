@@ -9,16 +9,19 @@ class LoginDialog(QDialog):
         super().__init__()
         self.setWindowTitle("Login")
         self.setFixedSize(300, 150)
+        self.setStyleSheet("""background-color: #b29c82; border-radius: 8px;""")
 
         layout = QVBoxLayout()
         # Username
         self.email_input = QLineEdit()
         self.email_input.setPlaceholderText("Username")
         layout.addWidget(self.email_input)
+        self.email_input.setStyleSheet("background-color: white;")
         # Password
         self.password_input = QLineEdit()
         self.password_input.setPlaceholderText("Password")
         self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
+        self.password_input.setStyleSheet("background-color: white;")
         layout.addWidget(self.password_input)
         # Login Button
         button_layout = QHBoxLayout()
@@ -28,6 +31,7 @@ class LoginDialog(QDialog):
         # Cancel Button
         cancel_button = QPushButton("Cancel")
         cancel_button.clicked.connect(self.reject)
+        cancel_button.setStyleSheet("styles.css")
         button_layout.addWidget(cancel_button)
 
         layout.addLayout(button_layout)

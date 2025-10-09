@@ -157,10 +157,12 @@ class MainWindow(QMainWindow):
         try:
             data = response.json()
         except json.JSONDecodeError:
-            print("Failed to decode JSON response.\n")
+            QMessageBox.warning(self, "Error", "Failed to decode JSON response.")
             return []
         if "error" in data:
-            print(f"Error fetching books: {data['error']['message']}\n")
+            QMessageBox.warning(
+                self, "Error", f"Error fetching books: {data['error']['message']}"
+            )
             return []
         books = data["data"]
         if books == []:

@@ -33,9 +33,6 @@ class LoginDialog(QDialog):
         layout.addLayout(button_layout)
         self.setLayout(layout)
 
-    def get_credentials(self):
-        return self.email_input.text(), self.password_input.text()
-
     def login(self):
         email = self.email_input.text()
         password = self.password_input.text()
@@ -66,12 +63,3 @@ class LoginDialog(QDialog):
             QMessageBox.warning(self, "Error", f"Failed to save token to file: {e}")
         QMessageBox.information(self, "success", "Login successful!")
         self.destroy()
-
-    def clicked_logout(self):
-        global token  # to modify the global token variable
-        # requests.post("https://lms.murtsa.dev/logout", headers={"Authorization": token})
-        del token  # remove token from global scope
-
-        self.login_button.setText("Login")
-        self.login_button.clicked.connect(self.clicked_login)
-        return

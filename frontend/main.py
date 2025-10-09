@@ -54,6 +54,7 @@ class MainWindow(QMainWindow):
         # Search box
         self.searchbox = QPlainTextEdit()
         self.searchbox.setPlaceholderText("Search...")
+        self.searchbox.textChanged.connect(self.changed_search)
         self.searchbox.setGeometry(50, 50, 2, 400)
         self.searchbox.setFixedHeight(30)
         self.searchbox.setFixedWidth(200)
@@ -120,7 +121,7 @@ class MainWindow(QMainWindow):
         self.books_table.setSortingEnabled(True)
         self.books_table.sortByColumn(0, Qt.SortOrder(0))
 
-        # Checked out books
+        # Checked out books table
         books = self.get_books()
         self.my_books_table = QTableWidget()
         self.my_books_table.setRowCount(len(books))
@@ -146,8 +147,6 @@ class MainWindow(QMainWindow):
         # Add widgets to stacked layout
         self.stacked_layout.addWidget(self.books_table)
         self.stacked_layout.addWidget(self.my_books_table)
-
-        self.searchbox.textChanged.connect(self.changed_search)
 
     # methods
     def get_books(self) -> list:
@@ -191,7 +190,7 @@ class MainWindow(QMainWindow):
         except FileNotFoundError:
             return False
 
-    def change_button_colors(self):
+    def change_button_colors(self) -> None:
         if self.stacked_layout.currentIndex() == 0:
             self.home_button.setStyleSheet("background-color: white; color: black")
             self.books_button.setStyleSheet("color: white")
@@ -221,6 +220,16 @@ class MainWindow(QMainWindow):
                 self.checkout_button.setProperty("book_id", book["id"])
                 self.checkout_button.clicked.connect(self.clicked_checkout)
                 self.books_table.setCellWidget(i, 3, self.checkout_button)
+        # checked_out_books = self.get_checked_out_books()
+        for i, book in enumerate(books):
+            self.my_books_table.setItem(i, 0, QTableWidgetItem(f"{book["title"]}"))
+            self.my_books_table.setItem(i, 1, QTableWidgetItem(f"{book["author"]}"))
+            self.my_books_table.setItem(i, 2, QTableWidgetItem(f"{book["isbn"]}"))
+            self.return_button = QPushButton("Return")
+            self.return_button.setStyleSheet("background-color: black; color: white;")
+            self.return_button.setProperty("book_id", book["id"])
+            self.return_button.clicked.connect(self.clicked_return)
+            self.my_books_table.setCellWidget(i, 3, self.return_button)
 
     # event handlers
 

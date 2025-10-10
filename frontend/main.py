@@ -1,6 +1,3 @@
-<<<<<<< Updated upstream
-#!/usr/bin/.env python3
-=======
 #!/usr/bin/env python3
 
 # Import necessary modules
@@ -435,4 +432,3 @@ def main():
 
 if __name__ == "__main__":
     main()
->>>>>>> Stashed changes

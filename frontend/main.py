@@ -415,6 +415,10 @@ class MainWindow(QMainWindow):
             self.login_button.clicked.connect(self.clicked_logout)
         else:
             self.clicked_login()
+            if self.is_logged_in():
+                self.stacked_layout.setCurrentIndex(1)
+            self.change_button_colors()
+            self.update_my_books_list()
 
 
 def main():

@@ -53,6 +53,30 @@ def get_books():
     return response
 
 
+# Returns a list of books checked out by the logged-in user
+@app.get("/my-books")
+async def get_my_books(request: Request):
+    """Returns a list of books checked out by the logged-in user"""
+    data = await request.json()
+    auth_token = request.headers["Authorization"]
+    supabase.postgrest.auth(auth_token)
+
+    # queries
+    my_books = "select id, title, author, isbn from books where id in (select book_id from checkout_logs where checkin_date IS NULL AND user_id=:user_id);"
+
+    with engine.connect() as connection:
+        result = connection.execute(text(my_books), {"user_id": data["user_id"]})
+        data = {"data": []}
+        if result.rowcount == 0:
+            response = "You haven't checked out any books"
+        else:
+            for book in result:
+                data["data"].append({"id": book._data[0], "title": book._data[1], "author": book._data[2], "isbn": book._data[3]})
+            response = data
+
+    return response
+
+
 @app.post("/signup")
 async def signup(request: Request):
     """Creates a new user in the database"""

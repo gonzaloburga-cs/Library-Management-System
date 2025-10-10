@@ -274,7 +274,7 @@ def main():
                         print_menu()
                     else:
                         login()
-                        sleep(2)
+                        sleep(sleep_time)
                         print_menu()
                 case "6":
                     print("Exiting...")

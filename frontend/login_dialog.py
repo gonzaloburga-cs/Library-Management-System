@@ -9,7 +9,7 @@ class LoginDialog(QDialog):
         super().__init__()
         self.setWindowTitle("Login")
         self.setFixedSize(300, 150)
-        self.setStyleSheet("""background-color: #b29c82; border-radius: 8px;""")
+        self.setStyleSheet("""background-color: #b29c82;""")
 
         layout = QVBoxLayout()
         # Username

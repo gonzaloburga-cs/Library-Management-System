@@ -17,7 +17,7 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
         self.setWindowTitle("Library Management System")
         self.setGeometry(100, 100, self.window_width, self.window_height)
-        self.setStyleSheet("background-color: #b29c82; border-radius: 8px;")
+        self.setStyleSheet("background-color: #b29c82;")
 
         # Create a central widget
         central_widget = QWidget()
@@ -178,7 +178,8 @@ class MainWindow(QMainWindow):
                 token = f.read().strip()
                 if token:
                     response = requests.get(
-                        "https://lms.murtsa.dev/user", headers={"Authorization": token}
+                        "https://lms.murtsa.dev/user",
+                        headers={"Authorization": token},
                     )
                     if response.status_code != 200:
                         try:
@@ -265,6 +266,9 @@ class MainWindow(QMainWindow):
 
         self.login_dialog = LoginDialog()
         self.login_dialog.show()
+        self.login_button.setText("Logout")
+        self.login_button.clicked.disconnect()
+        self.login_button.clicked.connect(self.clicked_logout)
         self.is_logged_in()
         return
 
@@ -344,8 +348,11 @@ class MainWindow(QMainWindow):
         self.change_button_colors()
 
     def clicked_books(self):
-        self.stacked_layout.setCurrentIndex(1)
-        self.change_button_colors()
+        if self.is_logged_in():
+            self.stacked_layout.setCurrentIndex(1)
+            self.change_button_colors()
+        else:
+            self.clicked_login()
 
 
 def main():

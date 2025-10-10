@@ -26,13 +26,20 @@ The Library-Management-System (LMS) is a web-based application that allows libra
 
 ### 3. Use Cases
 - **Search Catalog** — Student or staff searches books by title, author, ISBN, or subject; results show availability  
-- **Checkout Item** — Student checks out an item and sets the due date  
-- **Return Item** — Process item return and update availability  
-- **Renew Item** — Student or staff renews a checked-out item (if allowed)  
+- **Checkout Book** — Student checks out an item and sets the due date  
+- **Return Book** — Process item return and update availability  
+- **Renew Book** — Student or staff renews a checked-out item (if allowed)  
 - **Overdue Notifications** — System sends reminders when items are overdue  
 - **Add / Remove Book** — Librarian manages catalog records  
 - **View Current Loans** — User checks their borrowed books and due dates  
-- **Place Hold / Reserve Item** — User can reserve an item if unavailable  
+- **Place Hold / Reserve Item** — User can reserve an item if unavailable
+
+### 3a. Rainy day use cases
+- **Search Catalog** — No matching books found. System response: "No results found"
+- **Checkout Book** — Item is already checkout. System response: "Book is unavailable. Join waitlist?(y/n)"
+- **Return Book** — Return failed. System response: "Error in return process. Enter book ID again"
+- **Renew Book** - Renewal failed. System response: "Book cannot be renewed because of  waitlist"
+- **Add / Remove Book** —  Duplicate or invalid data. System response: "Adding book error. Try again"
 
 ---
 
@@ -41,15 +48,22 @@ The Library-Management-System is a web-based application with three main compone
 
 #### 1. Frontend
 - Website used by students and librarians  
-- Allows catalog search, borrowing/returning books, and reserving unavailable books  
+- Allows catalog search, borrowing/returning books, and reserving unavailable books
+- Communicates with the backend via API calls 
 
 #### 2. Backend
 - Handles application logic and communicates with the database  
-- Processes returns, reservations, and notifications  
+- Processes returns, reservations, and notifications
+- Implements API endpoints consumed by the frontend and Postman 
 
 #### 3. Database
 - Stores books, users, loans, and reservations  
-- Ensures data is correct and up to date  
+- Ensures data is correct and up to date
+- SupaBase is used as a backend database for authentication, storage, and live updates
+
+#### 4. External Systems
+- Postman: Test client for API verification
+- Email service for sending overdue notifications
 
 ---
 

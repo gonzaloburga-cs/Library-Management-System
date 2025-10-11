@@ -58,7 +58,7 @@ class MainWindow(QMainWindow):
         self.searchbox.setGeometry(50, 50, 2, 400)
         self.searchbox.setFixedHeight(30)
         self.searchbox.setFixedWidth(200)
-        self.searchbox.setStyleSheet("background-color: white;")
+        self.searchbox.setStyleSheet("background-color: white; color: black;")
         self.searchbox.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
         self.searchbox.setMaximumBlockCount(1)
 

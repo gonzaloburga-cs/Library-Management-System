@@ -58,7 +58,7 @@ class MainWindow(QMainWindow):
         self.searchbox.setGeometry(50, 50, 2, 400)
         self.searchbox.setFixedHeight(30)
         self.searchbox.setFixedWidth(200)
-        self.searchbox.setStyleSheet("background-color: white;")
+        self.searchbox.setStyleSheet("background-color: white; color: black;")
         self.searchbox.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
         self.searchbox.setMaximumBlockCount(1)
 
@@ -126,24 +126,23 @@ class MainWindow(QMainWindow):
         # Checked out books table
         books = self.get_books()
         self.my_books_table = QTableWidget()
-        self.my_books_table.setRowCount(len(books))
         self.my_books_table.setColumnCount(4)
         self.my_books_table.setHorizontalHeaderLabels(
             ["Title", "Author", "Due Date", " "]
         )
-        for i, book in enumerate(books):
-            self.my_books_table.setItem(i, 0, QTableWidgetItem(f"{book["title"]}"))
-            self.my_books_table.setItem(i, 1, QTableWidgetItem(f"{book["author"]}"))
-            self.my_books_table.setItem(i, 2, QTableWidgetItem(f"{book["isbn"]}"))
-            self.return_button = QPushButton("Return")
-            self.return_button.setStyleSheet("background-color: black; color: white;")
-            self.return_button.setProperty("book_id", book["id"])
-            self.return_button.clicked.connect(self.clicked_return)
-            self.my_books_table.setCellWidget(i, 3, self.return_button)
+        # my_books = self.get_my_books()
+        # for i, book in enumerate(my_books):
+        #     self.my_books_table.setItem(i, 0, QTableWidgetItem(f"{book["title"]}"))
+        #     self.my_books_table.setItem(i, 1, QTableWidgetItem(f"{book["author"]}"))
+        #     self.my_books_table.setItem(i, 2, QTableWidgetItem(f"{book["isbn"]}"))
+        #     self.return_button = QPushButton("Return")
+        #     self.return_button.setStyleSheet("background-color: black; color: white;")
+        #     self.return_button.setProperty("book_id", book["id"])
+        #     self.return_button.clicked.connect(self.clicked_return)
+        #     self.my_books_table.setCellWidget(i, 3, self.return_button)
 
         self.my_books_table.resizeColumnsToContents()
         self.my_books_table.resizeRowsToContents()
-        self.my_books_table.setSortingEnabled(True)
         self.my_books_table.sortByColumn(0, Qt.SortOrder(0))
 
         # Add widgets to stacked layout
@@ -170,6 +169,48 @@ class MainWindow(QMainWindow):
         if books == []:
             QMessageBox.warning(self, "Error", "There was a connection error")
         return books
+
+    def get_my_books(self):
+        if self.is_logged_in() == False:
+            return []
+        headers = {"Authorization": token, "Content-Type": "application/json"}
+        user_id = user_id = requests.get("https://lms.murtsa.dev/user", headers=headers)
+        # user_id = user_id = requests.get("http://127.0.0.1:8000/user", headers=headers)
+        user_id = user_id.text.strip('"')
+        payload = {"user_id": user_id}
+        response = requests.get(
+            "https://lms.murtsa.dev/my-books", headers=headers, json=payload
+        )
+        # response = requests.get(
+        #     "http://127.0.0.1:8000/my-books", headers=headers, json=payload
+        # )
+
+        if response.status_code == 200:
+            try:
+                data = response.json()
+            except json.JSONDecodeError:
+                QMessageBox.warning(self, "Error", "Failed to decode JSON response.")
+                return []
+            if "error" in data:
+                QMessageBox.warning(
+                    self, "Error", f"Error fetching books: {data['error']['message']}"
+                )
+                return []
+            try:
+                books = data["data"]
+            except TypeError:
+                QMessageBox.information(self, "Info", data)
+                return []
+            if books == []:
+                QMessageBox.warning(self, "Error", "There was a connection error")
+            return books
+        else:
+            QMessageBox.warning(
+                self,
+                "Error",
+                f"There was an error, code: {response.status_code} {response.text}",
+            )
+            return []
 
     def is_logged_in(self) -> bool:
         try:  # Basic token persistence
@@ -205,9 +246,10 @@ class MainWindow(QMainWindow):
 
     def update_book_list(self):
         books = self.get_books()
+        self.books_table.setSortingEnabled(False)
         for i, book in enumerate(books):
-            self.books_table.setItem(i, 0, QTableWidgetItem(f"Book {book["title"]}"))
-            self.books_table.setItem(i, 1, QTableWidgetItem(f"Author {book["author"]}"))
+            self.books_table.setItem(i, 0, QTableWidgetItem(f"{book["title"]}"))
+            self.books_table.setItem(i, 1, QTableWidgetItem(f"{book["author"]}"))
             self.books_table.setItem(i, 2, QTableWidgetItem(f"{book["isbn"]}"))
             if book["is_checked_out"] == True:
                 self.checkout_button = QPushButton("unavailable")
@@ -225,7 +267,14 @@ class MainWindow(QMainWindow):
                 self.checkout_button.setProperty("book_id", book["id"])
                 self.checkout_button.clicked.connect(self.clicked_checkout)
                 self.books_table.setCellWidget(i, 3, self.checkout_button)
-        # checked_out_books = self.get_checked_out_books()
+        self.books_table.resizeColumnsToContents()
+        self.books_table.resizeRowsToContents()
+        self.books_table.setSortingEnabled(True)
+
+    def update_my_books_list(self):
+        books = self.get_my_books()
+        self.my_books_table.setSortingEnabled(False)
+        self.my_books_table.setRowCount(len(books))
         for i, book in enumerate(books):
             self.my_books_table.setItem(i, 0, QTableWidgetItem(f"{book["title"]}"))
             self.my_books_table.setItem(i, 1, QTableWidgetItem(f"{book["author"]}"))
@@ -235,6 +284,9 @@ class MainWindow(QMainWindow):
             self.return_button.setProperty("book_id", book["id"])
             self.return_button.clicked.connect(self.clicked_return)
             self.my_books_table.setCellWidget(i, 3, self.return_button)
+        self.my_books_table.resizeColumnsToContents()
+        self.my_books_table.resizeRowsToContents()
+        self.my_books_table.setSortingEnabled(True)
 
     # event handlers
 
@@ -334,6 +386,11 @@ class MainWindow(QMainWindow):
         if response.status_code == 200:
             QMessageBox.information(self, "Info", response.text.strip('"'))
             self.update_book_list()
+            if self.my_books_table.rowCount() > 1:
+                self.update_my_books_list()
+            else:
+                self.my_books_table.setRowCount(0)
+                return
         else:
             QMessageBox.warning(
                 self,
@@ -346,13 +403,22 @@ class MainWindow(QMainWindow):
     def clicked_home(self):
         self.stacked_layout.setCurrentIndex(0)
         self.change_button_colors()
+        self.update_book_list()
 
     def clicked_books(self):
         if self.is_logged_in():
             self.stacked_layout.setCurrentIndex(1)
             self.change_button_colors()
+            self.update_my_books_list()
+            self.login_button.setText("Logout")
+            self.login_button.disconnect()
+            self.login_button.clicked.connect(self.clicked_logout)
         else:
             self.clicked_login()
+            if self.is_logged_in():
+                self.stacked_layout.setCurrentIndex(1)
+            self.change_button_colors()
+            self.update_my_books_list()
 
 
 def main():

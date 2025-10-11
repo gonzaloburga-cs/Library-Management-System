@@ -4,3 +4,5 @@ backend/__pycache__/
 frontend/.idea/
 .idea/
 token.txt
+frontend/__pycache__/
+tests/__pycache__/

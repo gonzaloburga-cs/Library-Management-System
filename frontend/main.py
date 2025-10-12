@@ -66,11 +66,11 @@ class MainWindow(QMainWindow):
         self.tabs = QTabWidget()
         # Home Button
         self.home_button = QPushButton("Home")
-        self.home_button.setStyleSheet("background-color: white; color: black;")
+        self.home_button.setStyleSheet("QPushButton {background-color: white; color: black;} QPushButton:hover {background-color: #B3814F; color: white; }")
         self.home_button.clicked.connect(self.clicked_home)
         # My Books button
         self.books_button = QPushButton("My Books")
-        self.books_button.setStyleSheet("background-color: #b29c82; color: white;")
+        self.books_button.setStyleSheet("QPushButton {background-color: #b29c82; color: white; } QPushButton:hover {background-color: #B3814F; color: white; }")
         self.books_button.clicked.connect(self.clicked_books)
 
         self.change_button_colors()
@@ -79,10 +79,12 @@ class MainWindow(QMainWindow):
         if self.is_logged_in():
             self.login_button = QPushButton("Logout")
             self.login_button.clicked.connect(self.clicked_logout)
+            self.login_button.setStyleSheet(
+                "QPushButton{color: white;} QPushButton:hover {background-color: #B3814F; color: white; }")
         else:
             self.login_button = QPushButton("Login")
             self.login_button.clicked.connect(self.clicked_login)
-        self.login_button.setStyleSheet("color: white;")
+            self.login_button.setStyleSheet("QPushButton{color: white;} QPushButton:hover {background-color: #B3814F; color: white; }")
 
         # add widgets to header
         self.header.addWidget(self.header_label)
@@ -112,7 +114,7 @@ class MainWindow(QMainWindow):
                 self.checkout_button = QPushButton("Check Out")
                 self.checkout_button.setEnabled(True)
                 self.checkout_button.setStyleSheet(
-                    "background-color: black; color: white;"
+                    "QPushButton {background-color: black; color: white;} QPushButton:hover {background-color: #3C3F41; color: white; }"
                 )
                 self.checkout_button.setProperty("book_id", book["id"])
                 self.checkout_button.clicked.connect(self.clicked_checkout)
@@ -122,6 +124,11 @@ class MainWindow(QMainWindow):
         self.books_table.resizeRowsToContents()
         self.books_table.setSortingEnabled(True)
         self.books_table.sortByColumn(0, Qt.SortOrder(0))
+        header = self.books_table.horizontalHeader()
+        header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
+        header.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
+
 
         # Checked out books table
         books = self.get_books()
@@ -280,13 +287,17 @@ class MainWindow(QMainWindow):
             self.my_books_table.setItem(i, 1, QTableWidgetItem(f"{book["author"]}"))
             self.my_books_table.setItem(i, 2, QTableWidgetItem(f"{book["isbn"]}"))
             self.return_button = QPushButton("Return")
-            self.return_button.setStyleSheet("background-color: black; color: white;")
+            self.return_button.setStyleSheet("QPushButton {background-color: black; color: white;} QPushButton:hover {background-color: #3C3F41; color: white; }")
             self.return_button.setProperty("book_id", book["id"])
             self.return_button.clicked.connect(self.clicked_return)
             self.my_books_table.setCellWidget(i, 3, self.return_button)
         self.my_books_table.resizeColumnsToContents()
         self.my_books_table.resizeRowsToContents()
         self.my_books_table.setSortingEnabled(True)
+        header = self.my_books_table.horizontalHeader()
+        header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
+        header.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
 
     # event handlers
 

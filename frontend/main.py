@@ -265,12 +265,20 @@ class MainWindow(QMainWindow):
             return
 
         self.login_dialog = LoginDialog()
-        self.login_dialog.show()
-        self.login_button.setText("Logout")
-        self.login_button.clicked.disconnect()
-        self.login_button.clicked.connect(self.clicked_logout)
-        self.is_logged_in()
-        return
+        result = self.login_dialog.exec()
+        # if login is successful
+        if result == QDialog.DialogCode.Accepted and self.is_logged_in():
+            self.login_button.setText("Logout")
+            self.login_button.clicked.disconnect()
+            self.login_button.clicked.connect(self.clicked_logout)
+            return
+        #if login fails
+        else:
+            self.login_button.setText("Login")
+            self.login_button.clicked.disconnect()
+            self.login_button.clicked.connect(self.clicked_login)
+            return
+
 
     def clicked_logout(self):
         global token

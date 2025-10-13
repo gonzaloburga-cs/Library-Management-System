@@ -51,8 +51,8 @@ class LoginDialog(QDialog):
         email = self.email_input.text()
         password = self.password_input.text()
         payload = '{"email": "' + email + '", "password": "' + password + '"}'
-        response = requests.post("https://lms.murtsa.dev/auth", data=payload)
-        #response = requests.post("http://127.0.0.1:8000/auth", data=payload)
+        #response = requests.post("https://lms.murtsa.dev/auth", data=payload)
+        response = requests.post("http://127.0.0.1:8000/auth", data=payload)
         # for testing local server
         global token
         token = response.text.strip(
@@ -76,14 +76,14 @@ class LoginDialog(QDialog):
         except Exception as e:
             QMessageBox.warning(self, "Error", f"Failed to save token to file: {e}")
         QMessageBox.information(self, "Success", "Login successful!")
-        self.destroy()
+        self.accept()
 
     def signup(self):
         email = self.email_input.text()
         password = self.password_input.text()
         payload = '{"email": "' + email + '", "password": "' + password + '"}'
-        response = requests.post("https://lms.murtsa.dev/signup", data=payload)
-        #response = requests.post("http://127.0.0.1:8000/signup", data=payload)
+        #response = requests.post("https://lms.murtsa.dev/signup", data=payload)
+        response = requests.post("http://127.0.0.1:8000/signup", data=payload)
         # for testing local server
 
         if response.status_code in [200,201]:

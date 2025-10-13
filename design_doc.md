@@ -82,4 +82,12 @@ The Library-Management-System is a web-based application with three main compone
 
 #### Overdue Notifications
 - Background job checks for loans where `due_at < today` AND `returned_at` is NULL  
-- Sends overdue notifications via email  
+- Sends overdue notifications via email
+
+---
+
+### 6. Class Definitions
+
+### UML Diagram
+<img width="2143" height="1986" alt="Untitled diagram-2025-10-13-014340" src="https://github.com/user-attachments/assets/97948e8b-de7b-4f9d-a474-2bce10fc5cf6" />
+

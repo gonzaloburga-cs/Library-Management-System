@@ -1,8 +1,24 @@
 # Library-Management-System
 
-This Repo is for team charlie in CS 2450 at UVU. 
+This Repo is for team charlie in CS 2450 at UVU.
 
-### Setup and Running CLI: 
+## Using the GUI
+
+Before starting the GUI make a virtual environment in python with `python -m venv .venv` and then run `.venv/scripts/activate` and install the necessary dependancies with `pip install -r frontend/requirements.txt`
+
+### Home Page
+
+The app will open to the home page where you can see all of the books in the database, and their check out status as well. Books cannot be checked out until you have signed in, this can be done by pressing the login button.
+
+### My Books Page
+
+The My Books page shows books you have checked out and allows you to return them. You cannot access this page without signing in, and you will be prompted to do so if you try.
+
+### Sign up
+
+To sign up, first press the login button, then enter your desired credentials and then click sign up. This will add your user to the database. Then you can sign in by pressing the login button again and entering your credentials. Once this is done you can access the full functionality of the app.
+
+## Setup and Running CLI
 it’s recommended to create a virtual environment for installing the requirements and then running backend/main.py in the venv. 
 
 Note: these instructions may vary slightly depending on OS and directory 
@@ -20,10 +36,9 @@ Note: these instructions may vary slightly depending on OS and directory
 
  
 
-## For Endpoint testing: 
+## For Endpoint testing
 
-#### Download Postman 
-
+#### Download Postman (For testing purposes only)
  
 
 - Local URL: http://127.0.0.1:8000 

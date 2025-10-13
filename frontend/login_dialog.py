@@ -21,12 +21,12 @@ class LoginDialog(QDialog):
         self.email_input = QLineEdit()
         self.email_input.setPlaceholderText("Username")
         layout.addWidget(self.email_input)
-        self.email_input.setStyleSheet("background-color: white;")
+        self.email_input.setStyleSheet("background-color: white; color: black;")
         # Password
         self.password_input = QLineEdit()
         self.password_input.setPlaceholderText("Password")
         self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
-        self.password_input.setStyleSheet("background-color: white;")
+        self.password_input.setStyleSheet("background-color: white; color: black;")
         layout.addWidget(self.password_input)
         # Login Button
         button_layout = QHBoxLayout()

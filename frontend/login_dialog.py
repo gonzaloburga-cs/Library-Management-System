@@ -10,6 +10,7 @@ import requests
 
 
 class LoginDialog(QDialog):
+    """Defines the login dialog window"""
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Login / Signup")
@@ -48,6 +49,7 @@ class LoginDialog(QDialog):
         self.setLayout(layout)
 
     def login(self):
+        """Logs the user in with the entered credentials"""
         email = self.email_input.text()
         password = self.password_input.text()
         payload = '{"email": "' + email + '", "password": "' + password + '"}'
@@ -79,6 +81,7 @@ class LoginDialog(QDialog):
         self.accept()
 
     def signup(self):
+        """Signs the user up with the entered credentials"""
         email = self.email_input.text()
         password = self.password_input.text()
         payload = '{"email": "' + email + '", "password": "' + password + '"}'

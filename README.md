@@ -4,19 +4,31 @@ This Repo is for team charlie in CS 2450 at UVU.
 
 ## Using the GUI
 
-Before starting the GUI make a virtual environment in python with `python -m venv .venv` and then run `.venv/scripts/activate` and install the necessary dependancies with `pip install -r frontend/requirements.txt`
+Before starting the GUI make a virtual environment in whatever directory your would like with python with the command `python -m venv .venv` and then run `path/to/environment/.venv/scripts/activate` and install the necessary dependancies with `pip install -r frontend/requirements.txt`
 
 ### Home Page
 
 The app will open to the home page where you can see all of the books in the database, and their check out status as well. Books cannot be checked out until you have signed in, this can be done by pressing the login button.
 
+<img width="952" height="632" alt="image" src="https://github.com/user-attachments/assets/a0cf82da-1537-4de4-88cb-1c4c3c2096a3" />
+
+
 ### My Books Page
 
 The My Books page shows books you have checked out and allows you to return them. You cannot access this page without signing in, and you will be prompted to do so if you try.
 
+<img width="952" height="632" alt="image" src="https://github.com/user-attachments/assets/08ef687d-7b9e-47e4-acfa-5798b8338da5" />
+
+
 ### Sign up
 
-To sign up, first press the login button, then enter your desired credentials and then click sign up. This will add your user to the database. Then you can sign in by pressing the login button again and entering your credentials. Once this is done you can access the full functionality of the app.
+To sign up, first press the login button, then enter your desired credentials and then click sign up. This will add your user to the database. Then you can sign in by pressing the login button again and entering your credentials and pressing Login. Once this is done you can access the full functionality of the app.
+
+<img width="952" height="632" alt="image" src="https://github.com/user-attachments/assets/921006d7-97c6-4335-bcd9-f531f8c25410" />
+
+<img width="302" height="182" alt="image" src="https://github.com/user-attachments/assets/16b109d2-0e10-4b3e-aea4-4dff609cf295" />
+
+
 
 ## Setup and Running CLI
 it’s recommended to create a virtual environment for installing the requirements and then running backend/main.py in the venv. 

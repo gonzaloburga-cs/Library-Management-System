@@ -11,6 +11,7 @@ import json
 
 
 class MainWindow(QMainWindow):
+    """This Class is the main window. It defines the widgets in the window as well as the layout"""
     def __init__(self):
         self.window_height = 600
         self.window_width = 800
@@ -137,17 +138,6 @@ class MainWindow(QMainWindow):
         self.my_books_table.setHorizontalHeaderLabels(
             ["Title", "Author", "Due Date", " "]
         )
-        # my_books = self.get_my_books()
-        # for i, book in enumerate(my_books):
-        #     self.my_books_table.setItem(i, 0, QTableWidgetItem(f"{book["title"]}"))
-        #     self.my_books_table.setItem(i, 1, QTableWidgetItem(f"{book["author"]}"))
-        #     self.my_books_table.setItem(i, 2, QTableWidgetItem(f"{book["isbn"]}"))
-        #     self.return_button = QPushButton("Return")
-        #     self.return_button.setStyleSheet("background-color: black; color: white;")
-        #     self.return_button.setProperty("book_id", book["id"])
-        #     self.return_button.clicked.connect(self.clicked_return)
-        #     self.my_books_table.setCellWidget(i, 3, self.return_button)
-
         self.my_books_table.resizeColumnsToContents()
         self.my_books_table.resizeRowsToContents()
         self.my_books_table.sortByColumn(0, Qt.SortOrder(0))
@@ -158,7 +148,7 @@ class MainWindow(QMainWindow):
 
     # methods
     def get_books(self) -> list:
-
+        """This function gets the books from the database and returns the result as a list"""
         response = requests.get("https://lms.murtsa.dev/books")
         # response = requests.get("http://127.0.0.1:8000/books")
 
@@ -177,7 +167,8 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self, "Error", "There was a connection error")
         return books
 
-    def get_my_books(self):
+    def get_my_books(self) -> list:
+        """Gets the books the user has checked out and returns it as a list"""
         if self.is_logged_in() == False:
             return []
         headers = {"Authorization": token, "Content-Type": "application/json"}
@@ -220,6 +211,7 @@ class MainWindow(QMainWindow):
             return []
 
     def is_logged_in(self) -> bool:
+        """Checks to see if the user is logged in, and returns a bool"""
         try:  # Basic token persistence
             with open("token.txt", "r") as f:
                 global token
@@ -244,6 +236,7 @@ class MainWindow(QMainWindow):
             return False
 
     def change_button_colors(self) -> None:
+        """Updates the colors of the Home and Books buttons"""
         if self.stacked_layout.currentIndex() == 0:
             self.home_button.setStyleSheet("background-color: white; color: black")
             self.books_button.setStyleSheet("color: white")
@@ -252,6 +245,7 @@ class MainWindow(QMainWindow):
             self.books_button.setStyleSheet("background-color: white; color: black")
 
     def update_book_list(self):
+        """Updates the table of books on the home page"""
         books = self.get_books()
         self.books_table.setSortingEnabled(False)
         for i, book in enumerate(books):
@@ -279,6 +273,7 @@ class MainWindow(QMainWindow):
         self.books_table.setSortingEnabled(True)
 
     def update_my_books_list(self):
+        """Updates the table of books on the my books page"""
         books = self.get_my_books()
         self.my_books_table.setSortingEnabled(False)
         self.my_books_table.setRowCount(len(books))
@@ -302,6 +297,7 @@ class MainWindow(QMainWindow):
     # event handlers
 
     def changed_search(self):
+        """Updates the selected item in the tables when text is entered into the search box"""
         text = self.searchbox.toPlainText()
         if text == "":
             self.books_table.setCurrentItem(None)
@@ -320,6 +316,7 @@ class MainWindow(QMainWindow):
             self.my_books_table.setCurrentItem(item)
 
     def clicked_login(self):
+        """Spawns the login dialog and updates the login button"""
         if self.is_logged_in():
             QMessageBox.information(self, "Info", "You have been logged in")
             self.login_button.setText("Logout")
@@ -344,6 +341,7 @@ class MainWindow(QMainWindow):
 
 
     def clicked_logout(self):
+        """Logs out the user and updates the logout button"""
         global token
         # response = requests.post("https://lms.murtsa.dev/auth", data=token)
         del token
@@ -353,6 +351,7 @@ class MainWindow(QMainWindow):
         QMessageBox.information(self, "Info", "You are logged out")
 
     def clicked_checkout(self):
+        """Checks out the desired book"""
         if not self.is_logged_in():
             QMessageBox.warning(
                 self, "Error", "You must be logged in to checkout a book"
@@ -420,11 +419,13 @@ class MainWindow(QMainWindow):
         return
 
     def clicked_home(self):
+        """Changes the page to the home menu"""
         self.stacked_layout.setCurrentIndex(0)
         self.change_button_colors()
         self.update_book_list()
 
     def clicked_books(self):
+        """Changes the page to the my books menu"""
         if self.is_logged_in():
             self.stacked_layout.setCurrentIndex(1)
             self.change_button_colors()

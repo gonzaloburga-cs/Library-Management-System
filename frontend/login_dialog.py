@@ -76,7 +76,7 @@ class LoginDialog(QDialog):
         except Exception as e:
             QMessageBox.warning(self, "Error", f"Failed to save token to file: {e}")
         QMessageBox.information(self, "Success", "Login successful!")
-        self.destroy()
+        self.accept()
 
     def signup(self):
         email = self.email_input.text()

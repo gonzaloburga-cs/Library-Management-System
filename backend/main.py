@@ -41,6 +41,7 @@ def is_logged_in() -> bool:
             token = f.read().strip()
             if token:
                 response = requests.get("https://lms.murtsa.dev/user", headers={"Authorization": token})
+                #response = requests.get("http://127.0.0.1:8000/user", headers={"Authorization": token})
                 if response.status_code != 200:
                     try:
                         os.remove("token.txt")
@@ -64,7 +65,7 @@ def login() -> None:  # puts token in global scope
         password = maskpass.askpass("Enter your password: ")
         payload = '{"email": "' + email + '", "password": "' + password + '"}'
         response = requests.post('https://lms.murtsa.dev/auth', data= payload)
-        # response = requests.post("http://127.0.0.1:8000/auth", data=payload)
+        #response = requests.post("http://127.0.0.1:8000/auth", data=payload)
         # for testing local server
         global token
         token = response.text.strip('"')  # the request hits the server, but it returns an empty string
@@ -101,6 +102,7 @@ def logout() -> None:
     """Logs out the user and deletes the saved token."""
     global token  # to modify the global token variable
     requests.post("https://lms.murtsa.dev/logout")
+    #requests.post("http://127.0.0.1:8000/logout")
     # server.supabase.auth.admin.sign_out(token.strip('"'))
     del token  # remove token from global scope
     return

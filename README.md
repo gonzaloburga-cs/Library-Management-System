@@ -4,6 +4,8 @@ This Repo is for team charlie in CS 2450 at UVU.
 
 ## Using the GUI
 
+There is an EXE available in the root of the repo. It will install the GUI onto your machine. If you would like to test the python code yourself, keep reading.
+
 Before starting the GUI make a virtual environment in whatever directory your would like with python with the command `python -m venv .venv` and then run `path/to/environment/.venv/scripts/activate` and install the necessary dependancies with `pip install -r frontend/requirements.txt`
 
 ### Home Page

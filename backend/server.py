@@ -54,7 +54,7 @@ def get_books():
 
 
 # Returns a list of books checked out by the logged-in user
-@app.get("/my-books")
+@app.post("/my-books")
 async def get_my_books(request: Request):
     """Returns a list of books checked out by the logged-in user"""
     data = await request.json()
@@ -81,13 +81,16 @@ async def get_my_books(request: Request):
 async def signup(request: Request):
     """Creates a new user in the database"""
     data = await request.json()
-
-    create_user = supabase.auth.sign_up({"email": data["email"], "password": data["password"]})
+    try:
+        create_user = supabase.auth.sign_up({"email": data["email"], "password": data["password"]})
+    except Exception as e:
+        response = {"message": e.message, "status": 400}
+        return response
 
     supabase_id = create_user.user.id
     supabase_service_client.table("users").insert({"supabase_id": supabase_id}).execute()
-
-    return "User created successfully"
+    response = {"message": "User created successfully", "status": 200}
+    return response
 
 
 @app.post("/logout")

@@ -10,9 +10,10 @@ import requests
 
 
 class LoginDialog(QDialog):
+    """Defines the login dialog window"""
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Login")
+        self.setWindowTitle("Login / Signup")
         self.setFixedSize(300, 150)
         self.setStyleSheet("""background-color: #b29c82;""")
 
@@ -21,18 +22,23 @@ class LoginDialog(QDialog):
         self.email_input = QLineEdit()
         self.email_input.setPlaceholderText("Username")
         layout.addWidget(self.email_input)
-        self.email_input.setStyleSheet("background-color: white;")
+        self.email_input.setStyleSheet("background-color: white; color: black;")
         # Password
         self.password_input = QLineEdit()
         self.password_input.setPlaceholderText("Password")
         self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
-        self.password_input.setStyleSheet("background-color: white;")
+        self.password_input.setStyleSheet("background-color: white; color: black;")
         layout.addWidget(self.password_input)
         # Login Button
         button_layout = QHBoxLayout()
         login_button = QPushButton("Login")
         login_button.clicked.connect(self.login)
         button_layout.addWidget(login_button)
+        # Signup Button
+        signup_button = QPushButton("Signup")
+        signup_button.clicked.connect(self.signup)
+        button_layout.addWidget(signup_button)
+
         # Cancel Button
         cancel_button = QPushButton("Cancel")
         cancel_button.clicked.connect(self.reject)
@@ -43,11 +49,12 @@ class LoginDialog(QDialog):
         self.setLayout(layout)
 
     def login(self):
+        """Logs the user in with the entered credentials"""
         email = self.email_input.text()
         password = self.password_input.text()
         payload = '{"email": "' + email + '", "password": "' + password + '"}'
         response = requests.post("https://lms.murtsa.dev/auth", data=payload)
-        # response = requests.post("http://127.0.0.1:8000/auth", data=payload)
+        #response = requests.post("http://127.0.0.1:8000/auth", data=payload)
         # for testing local server
         global token
         token = response.text.strip(
@@ -70,5 +77,22 @@ class LoginDialog(QDialog):
                 f.write(token)
         except Exception as e:
             QMessageBox.warning(self, "Error", f"Failed to save token to file: {e}")
-        QMessageBox.information(self, "success", "Login successful!")
-        self.destroy()
+        QMessageBox.information(self, "Success", "Login successful!")
+        self.accept()
+
+    def signup(self):
+        """Signs the user up with the entered credentials"""
+        email = self.email_input.text()
+        password = self.password_input.text()
+        payload = '{"email": "' + email + '", "password": "' + password + '"}'
+        response = requests.post("https://lms.murtsa.dev/signup", data=payload)
+        # response = requests.post("http://127.0.0.1:8000/signup", data=payload)
+        # for testing local server
+        if response.json().get("status") in [200,201]:
+            QMessageBox.information(self, "Success", "Thanks for signing up! You can now log in.")
+            return
+        else:
+            QMessageBox.warning(
+                self, "Error", f"Error: {response.json().get('message')}")
+            return
+

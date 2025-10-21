@@ -172,14 +172,14 @@ class MainWindow(QMainWindow):
         if self.is_logged_in() == False:
             return []
         headers = {"Authorization": token, "Content-Type": "application/json"}
-        user_id = user_id = requests.get("https://lms.murtsa.dev/user", headers=headers)
-        # user_id = user_id = requests.get("http://127.0.0.1:8000/user", headers=headers)
+        user_id = requests.get("https://lms.murtsa.dev/user", headers=headers)
+        # user_id = requests.get("http://127.0.0.1:8000/user", headers=headers)
         user_id = user_id.text.strip('"')
         payload = {"user_id": user_id}
-        response = requests.get(
+        response = requests.post(
             "https://lms.murtsa.dev/my-books", headers=headers, json=payload
         )
-        # response = requests.get(
+        # response = requests.post(
         #     "http://127.0.0.1:8000/my-books", headers=headers, json=payload
         # )
 

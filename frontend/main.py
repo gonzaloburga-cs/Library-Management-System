@@ -348,6 +348,7 @@ class MainWindow(QMainWindow):
         self.login_button.setText("Login")
         self.login_button.clicked.disconnect()
         self.login_button.clicked.connect(self.clicked_login)
+        self.clicked_home()
         QMessageBox.information(self, "Info", "You are logged out")
 
     def clicked_checkout(self):

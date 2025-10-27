@@ -39,7 +39,7 @@ Note: these instructions may vary slightly depending on OS and directory
 
  
 
-- Create a venv in your desired directory: python -m venv .venv 
+- Create a venv in your desired directory: python -m venv .venv (While developing, we created two different virtual environments to avoid any conflicts between the server and the GUI libraries)
 - backend/.venv/scripts/activate (.venv will be replaced with whatever your virtual environment directory is called. This will activate your venv) 
 
 - pip install -r backend/requirements.txt 

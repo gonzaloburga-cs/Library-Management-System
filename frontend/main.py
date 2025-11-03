@@ -16,9 +16,10 @@ class MainWindow(QMainWindow):
         self.window_height = 600
         self.window_width = 800
         super(MainWindow, self).__init__()
+        self.load_colors()
         self.setWindowTitle("Library Management System")
         self.setGeometry(100, 100, self.window_width, self.window_height)
-        self.setStyleSheet("background-color: #b29c82;")
+        self.setStyleSheet(f"background-color: {self.primary_color};")
 
         # Create a central widget
         central_widget = QWidget()
@@ -50,7 +51,7 @@ class MainWindow(QMainWindow):
         self.header_label.setFont(QFont("Arial", 24))
         self.header_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.header_label.setFixedHeight(50)
-        self.header_label.setStyleSheet("color: white;")
+        self.header_label.setStyleSheet(f"color: {self.secondary_color};")
 
         # Search box
         self.searchbox = QPlainTextEdit()
@@ -145,6 +146,24 @@ class MainWindow(QMainWindow):
         # Add widgets to stacked layout
         self.stacked_layout.addWidget(self.books_table)
         self.stacked_layout.addWidget(self.my_books_table)
+
+    # UVU Colors
+    def load_colors(self):
+        """Load UVU colors from JSON config"""
+        default_colors = {"primary": "#4C721D", "secondary": "#FFFFFF"}
+        if os.path.exists("colors.json"):
+            try:
+                with open("colors.json", "r") as f:
+                    colors = json.load(f)
+                    self.primary_color = colors.get("primary", default_colors["primary"])
+                    self.secondary_color = colors.get("secondary", default_colors["secondary"])
+            except Exception:
+                self.primary_color = default_colors["primary"]
+                self.secondary_color = default_colors["secondary"]
+        else: 
+            self.primary_color = default_colors["primary"]
+            self.secondary_color = default_colors["secondary"]
+
 
     # methods
     def get_books(self) -> list:

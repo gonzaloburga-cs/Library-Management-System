@@ -12,6 +12,7 @@ import json
 
 class MainWindow(QMainWindow):
     """This Class is the main window. It defines the widgets in the window as well as the layout"""
+
     def __init__(self):
         self.window_height = 600
         self.window_width = 800
@@ -67,11 +68,15 @@ class MainWindow(QMainWindow):
         self.tabs = QTabWidget()
         # Home Button
         self.home_button = QPushButton("Home")
-        self.home_button.setStyleSheet("QPushButton {background-color: white; color: black;} QPushButton:hover {background-color: #B3814F; color: white; }")
+        self.home_button.setStyleSheet(
+            "QPushButton {background-color: white; color: black;} QPushButton:hover {background-color: #B3814F; color: white; }"
+        )
         self.home_button.clicked.connect(self.clicked_home)
         # My Books button
         self.books_button = QPushButton("My Books")
-        self.books_button.setStyleSheet("QPushButton {background-color: #b29c82; color: white; } QPushButton:hover {background-color: #B3814F; color: white; }")
+        self.books_button.setStyleSheet(
+            "QPushButton {background-color: #b29c82; color: white; } QPushButton:hover {background-color: #B3814F; color: white; }"
+        )
         self.books_button.clicked.connect(self.clicked_books)
 
         self.change_button_colors()
@@ -81,11 +86,14 @@ class MainWindow(QMainWindow):
             self.login_button = QPushButton("Logout")
             self.login_button.clicked.connect(self.clicked_logout)
             self.login_button.setStyleSheet(
-                "QPushButton{color: white;} QPushButton:hover {background-color: #B3814F; color: white; }")
+                "QPushButton{color: white;} QPushButton:hover {background-color: #B3814F; color: white; }"
+            )
         else:
             self.login_button = QPushButton("Login")
             self.login_button.clicked.connect(self.clicked_login)
-            self.login_button.setStyleSheet("QPushButton{color: white;} QPushButton:hover {background-color: #B3814F; color: white; }")
+            self.login_button.setStyleSheet(
+                "QPushButton{color: white;} QPushButton:hover {background-color: #B3814F; color: white; }"
+            )
 
         # add widgets to header
         self.header.addWidget(self.header_label)
@@ -129,7 +137,6 @@ class MainWindow(QMainWindow):
         header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
         header.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
         header.setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
-
 
         # Checked out books table
         books = self.get_books()
@@ -282,7 +289,9 @@ class MainWindow(QMainWindow):
             self.my_books_table.setItem(i, 1, QTableWidgetItem(f"{book["author"]}"))
             self.my_books_table.setItem(i, 2, QTableWidgetItem(f"{book["isbn"]}"))
             self.return_button = QPushButton("Return")
-            self.return_button.setStyleSheet("QPushButton {background-color: black; color: white;} QPushButton:hover {background-color: #3C3F41; color: white; }")
+            self.return_button.setStyleSheet(
+                "QPushButton {background-color: black; color: white;} QPushButton:hover {background-color: #3C3F41; color: white; }"
+            )
             self.return_button.setProperty("book_id", book["id"])
             self.return_button.clicked.connect(self.clicked_return)
             self.my_books_table.setCellWidget(i, 3, self.return_button)
@@ -332,17 +341,17 @@ class MainWindow(QMainWindow):
             self.login_button.clicked.disconnect()
             self.login_button.clicked.connect(self.clicked_logout)
             return
-        #if login fails
+        # if login fails
         else:
             self.login_button.setText("Login")
             self.login_button.clicked.disconnect()
             self.login_button.clicked.connect(self.clicked_login)
             return
 
-
     def clicked_logout(self):
         """Logs out the user and updates the logout button"""
         global token
+        requests.post("https://lms.murtsa.dev/logout")
         # response = requests.post("https://lms.murtsa.dev/auth", data=token)
         del token
         self.login_button.setText("Login")

@@ -37,18 +37,25 @@ it’s recommended to create a virtual environment for installing the requiremen
 
 Note: these instructions may vary slightly depending on OS and directory 
 
- 
+- Change to the backend folder: `cd backend`
+- Create a virtual environment for the backend of the app (This includes the server and the CLI): `python -m venv .venv`
+- Activate the venv: `.venv/scripts/activate` (.venv will be replaced with whatever your virtual environment directory is called.)
 
-- Create a venv in your desired directory: python -m venv .venv (While developing, we created two different virtual environments to avoid any conflicts between the server and the GUI libraries)
-- backend/.venv/scripts/activate (.venv will be replaced with whatever your virtual environment directory is called. This will activate your venv) 
+- next, install the dependancies for the backend (This includes the dependancies to run the server locally): `pip install -r requirements.txt` 
 
-- pip install -r backend/requirements.txt 
+<img width="1034" height="104" alt="image" src="https://github.com/user-attachments/assets/5f6a046c-f4e0-49a1-898e-605fce448f88" />
 
-- uvicorn server:app –reload (run this if you need to run the local server but isn’t required for the cli to work as the backend is hosted) Also I cd into the backend before running this otherwise you would probably need to run uvicorn backend.server:app –reload but that was giving me some issues so I think it’s better to just switch to the backend directory first 
+- If you want to run the backend server locally run: `uvicorn server:app –reload` The server is hosted, so this is not necessary for regular usage.
 
-- With your venv active run python backend/main.py or python main.py depending on your directory to start the CLI 
+- With your venv active, run `python main.py` to start the CLI.
 
- 
+<img width="882" height="28" alt="image" src="https://github.com/user-attachments/assets/324f73e3-7cfc-421a-a930-e0d09526a07f" />
+
+- Main Menu:
+
+<img width="285" height="223" alt="image" src="https://github.com/user-attachments/assets/b4acc376-6bb0-4cb4-b988-cb81ee5d1a35" />
+
+Once you are on the main menu, enter the number for the option that you would like to activate.
 
 ## For Endpoint testing
 

@@ -158,6 +158,7 @@ def print_books() -> None:
 
 
 def print_my_books() -> None:
+    """Gets the books the user has checked out and returns it as a list"""
     if is_logged_in() == False:
         return
     headers = {"Authorization": token, "Content-Type": "application/json"}

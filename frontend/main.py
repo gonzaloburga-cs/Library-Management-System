@@ -19,10 +19,11 @@ class MainWindow(QMainWindow):
         self.load_colors()
         self.setWindowTitle("Library Management System")
         self.setGeometry(100, 100, self.window_width, self.window_height)
-        self.setStyleSheet(f"background-color: {self.primary_color};")
+        #self.setStyleSheet(f"background-color: {self.primary_color};")
 
         # Create a central widget
         central_widget = QWidget()
+        central_widget.setStyleSheet("background-color: #c9c9c9;")
         self.setCentralWidget(central_widget)
 
         # Main Layout
@@ -42,7 +43,13 @@ class MainWindow(QMainWindow):
         self.stacked_layout.setSpacing(20)
 
         # Add layouts to main
-        main_layout.addLayout(self.header)
+        #main_layout.addLayout(self.header)
+        header_widget = QWidget()
+        header_widget.setLayout(self.header)
+        header_widget.setStyleSheet(f"background-color: {self.primary_color};")
+
+        main_layout.addWidget(header_widget)
+
         main_layout.addLayout(self.stacked_layout)
 
         ## Widgets
@@ -135,6 +142,14 @@ class MainWindow(QMainWindow):
         self.books_table.resizeColumnsToContents()
         self.books_table.resizeRowsToContents()
         self.books_table.setSortingEnabled(True)
+        self.books_table.verticalHeader().setStyleSheet("""
+            QHeaderView::section {
+                background-color: #E0E0E0;
+                border: 1px solid black;
+            }
+        """)
+        self.books_table.verticalHeader().setVisible(True)
+        self.books_table.verticalHeader().setDefaultAlignment(Qt.AlignmentFlag.AlignCenter)
         self.books_table.sortByColumn(0, Qt.SortOrder(0))
         header = self.books_table.horizontalHeader()
         header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
@@ -152,7 +167,7 @@ class MainWindow(QMainWindow):
                 font-size: 14px;
             }
             QHeaderView::section {
-                background-color: #E0E0E0;
+                background-color: #c9c9c9;
                 color: black;
                 padding: 5px;
                 border: none;
@@ -163,10 +178,10 @@ class MainWindow(QMainWindow):
         self.books_table.setAlternatingRowColors(True)
         self.books_table.setStyleSheet(self.books_table.styleSheet() + """
             QTableWidget::item:alternate {
-                background-color: #F3F4E6;
+                background-color: #FAFAFA;
             }
             QTableWidget::item {
-                background-color: #E8EAE0;
+                background-color: #EDEDED;
             }
         """)
 
@@ -181,8 +196,23 @@ class MainWindow(QMainWindow):
         self.my_books_table.resizeRowsToContents()
         self.my_books_table.sortByColumn(0, Qt.SortOrder(0))
 
+        # books_table container to add side padding
+        books_table_container = QWidget()
+        books_table_layout = QVBoxLayout()
+        books_table_layout.setContentsMargins(20, 0, 20, 0)  # left, top, right, bottom
+        books_table_layout.addWidget(self.books_table)
+        books_table_container.setLayout(books_table_layout)
+
+        # my_books_table container to add side padding
+        my_books_table_container = QWidget()
+        my_books_table_layout = QVBoxLayout()
+        my_books_table_layout.setContentsMargins(20, 0, 20, 0)
+        my_books_table_layout.addWidget(self.my_books_table)
+        my_books_table_container.setLayout(my_books_table_layout)
+
+ 
         # Add widgets to stacked layout
-        self.stacked_layout.addWidget(self.books_table)
+        self.stacked_layout.addWidget(books_table_container)
         self.stacked_layout.addWidget(self.my_books_table)
 
     # UVU Colors
@@ -402,7 +432,7 @@ class MainWindow(QMainWindow):
     def clicked_logout(self):
         """Logs out the user and updates the logout button"""
         global token
-        requests.post(“https://lms.murtsa.dev/logout”)
+        requests.post("https://lms.murtsa.dev/logout")
         # response = requests.post("https://lms.murtsa.dev/auth", data=token)
         del token
         self.login_button.setText("Login")

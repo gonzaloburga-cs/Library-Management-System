@@ -11,6 +11,7 @@ import json
 
 class MainWindow(QMainWindow):
     """This Class is the main window. It defines the widgets in the window as well as the layout"""
+
     def __init__(self):
         self.window_height = 600
         self.window_width = 800
@@ -54,14 +55,14 @@ class MainWindow(QMainWindow):
         self.header_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.header_label.setFixedHeight(50)
         self.header_label.setStyleSheet(f"color: {self.secondary_color};")
-        
 
         # Search box
         self.searchbox = QLineEdit()
         self.searchbox.setPlaceholderText("Search books...")
         self.searchbox.setFixedHeight(30)
         self.searchbox.setFixedWidth(250)
-        self.searchbox.setStyleSheet("""
+        self.searchbox.setStyleSheet(
+            """
             QLineEdit {
                 background-color: white;
                 color: black;
@@ -71,29 +72,38 @@ class MainWindow(QMainWindow):
             QLineEdit:focus {
                 border: 2px solid #4C721D;
             }
-        """)
+        """
+        )
         self.searchbox.textChanged.connect(self.changed_search)
 
         # Home Button
         self.home_button = QPushButton("Home")
-        self.home_button.setStyleSheet("QPushButton {background-color: #FFFFFF; color: black; } QPushButton:hover {background-color: grey; color: black; }")
+        self.home_button.setStyleSheet(
+            "QPushButton {background-color: #FFFFFF; color: black; } QPushButton:hover {background-color: grey; color: black; }"
+        )
         self.home_button.clicked.connect(self.clicked_home)
 
         # My Books button
         self.books_button = QPushButton("My Books")
-        self.books_button.setStyleSheet("QPushButton {background-color: #FFFFFF; color: black; } QPushButton:hover {background-color: grey; color: black; }")
+        self.books_button.setStyleSheet(
+            "QPushButton {background-color: #FFFFFF; color: black; } QPushButton:hover {background-color: grey; color: black; }"
+        )
         self.books_button.clicked.connect(self.clicked_books)
 
         # Login Button
         if self.is_logged_in():
             self.login_button = QPushButton("Logout")
             self.login_button.clicked.connect(self.clicked_logout)
-            self.login_button.setStyleSheet("QPushButton {background-color: #FFFFFF; color: black; } QPushButton:hover {background-color: red; color: black; }")
-            
+            self.login_button.setStyleSheet(
+                "QPushButton {background-color: #FFFFFF; color: black; } QPushButton:hover {background-color: red; color: black; }"
+            )
+
         else:
             self.login_button = QPushButton("Login")
             self.login_button.clicked.connect(self.clicked_login)
-            self.login_button.setStyleSheet("QPushButton {background-color: #FFFFFF; color: black; } QPushButton:hover {background-color: grey; color: black; }")
+            self.login_button.setStyleSheet(
+                "QPushButton {background-color: #FFFFFF; color: black; } QPushButton:hover {background-color: grey; color: black; }"
+            )
 
         # add widgets to header
         self.header.addWidget(self.header_label)
@@ -116,7 +126,9 @@ class MainWindow(QMainWindow):
             if book["is_checked_out"] == True:
                 self.checkout_button = QPushButton("unavailable")
                 self.checkout_button.setEnabled(False)
-                self.checkout_button.setStyleSheet("background-color: red; color: white;")
+                self.checkout_button.setStyleSheet(
+                    "background-color: red; color: white;"
+                )
                 self.books_table.setCellWidget(i, 3, self.checkout_button)
             else:
                 self.checkout_button = QPushButton("Check Out")
@@ -131,22 +143,27 @@ class MainWindow(QMainWindow):
         self.books_table.resizeColumnsToContents()
         self.books_table.resizeRowsToContents()
         self.books_table.setSortingEnabled(True)
-        self.books_table.verticalHeader().setStyleSheet("""
+        self.books_table.verticalHeader().setStyleSheet(
+            """
             QHeaderView::section {
                 background-color: #E0E0E0;
                 border: 1px solid black;
             }
-        """)
+        """
+        )
         self.books_table.verticalHeader().setVisible(True)
-        self.books_table.verticalHeader().setDefaultAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.books_table.verticalHeader().setDefaultAlignment(
+            Qt.AlignmentFlag.AlignCenter
+        )
         self.books_table.sortByColumn(0, Qt.SortOrder(0))
         header = self.books_table.horizontalHeader()
         header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
         header.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
         header.setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
 
-        #Table of books style sheet
-        self.books_table.setStyleSheet("""
+        # Table of books style sheet
+        self.books_table.setStyleSheet(
+            """
             QTableWidget {
                 background-color: transparent; 
                 selection-background-color: #D3D3D3;
@@ -168,8 +185,9 @@ class MainWindow(QMainWindow):
             QTableWidget::item {
                 background-color: #EDEDED;
             }
-        """)
-        #Alternating row colors
+        """
+        )
+        # Alternating row colors
         self.books_table.setAlternatingRowColors(True)
 
         self.books_table.viewport().update()
@@ -200,28 +218,30 @@ class MainWindow(QMainWindow):
         my_books_table_layout.addWidget(self.my_books_table)
         my_books_table_container.setLayout(my_books_table_layout)
 
- 
         # Add widgets to stacked layout
         self.stacked_layout.addWidget(books_table_container)
         self.stacked_layout.addWidget(my_books_table_container)
 
     # UVU Colors
-    def load_colors(self):
+    def load_colors(self) -> None:
         """Load UVU colors from JSON config"""
         default_colors = {"primary": "#4C721D", "secondary": "#FFFFFF"}
         if os.path.exists("colors.json"):
             try:
                 with open("colors.json", "r") as f:
                     colors = json.load(f)
-                    self.primary_color = colors.get("primary", default_colors["primary"])
-                    self.secondary_color = colors.get("secondary", default_colors["secondary"])
+                    self.primary_color = colors.get(
+                        "primary", default_colors["primary"]
+                    )
+                    self.secondary_color = colors.get(
+                        "secondary", default_colors["secondary"]
+                    )
             except Exception:
                 self.primary_color = default_colors["primary"]
                 self.secondary_color = default_colors["secondary"]
-        else: 
+        else:
             self.primary_color = default_colors["primary"]
             self.secondary_color = default_colors["secondary"]
-
 
     # methods
     def get_books(self) -> list:
@@ -354,7 +374,9 @@ class MainWindow(QMainWindow):
             self.my_books_table.setItem(i, 2, QTableWidgetItem(f"{str(due_date)}"))
             self.return_button = QPushButton("Return")
             self.return_button.setProperty("book_id", book["id"])
-            self.return_button.setStyleSheet("QPushButton {background-color: #FFFFFF; color: black; } QPushButton:hover {background-color: #DDDDDD; color: black; }")
+            self.return_button.setStyleSheet(
+                "QPushButton {background-color: #FFFFFF; color: black; } QPushButton:hover {background-color: #DDDDDD; color: black; }"
+            )
             self.return_button.clicked.connect(self.clicked_return)
             self.my_books_table.setCellWidget(i, 3, self.return_button)
         self.my_books_table.resizeColumnsToContents()
@@ -403,13 +425,12 @@ class MainWindow(QMainWindow):
             self.login_button.clicked.disconnect()
             self.login_button.clicked.connect(self.clicked_logout)
             return
-        #if login fails
+        # if login fails
         else:
             self.login_button.setText("Login")
             self.login_button.clicked.disconnect()
             self.login_button.clicked.connect(self.clicked_login)
             return
-
 
     def clicked_logout(self):
         """Logs out the user and updates the logout button"""
@@ -516,7 +537,7 @@ class MainWindow(QMainWindow):
 
 def main():
     app = QApplication([])
-    
+
     # Create main window
     main_window = MainWindow()
 

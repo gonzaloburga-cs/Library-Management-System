@@ -13,20 +13,24 @@ import os
 
 class LoginDialog(QDialog):
     """Defines the login dialog window"""
+
     def __init__(self):
         super().__init__()
         self.load_colors()
         self.setWindowTitle("Login / Signup")
         self.setFixedSize(300, 150)
         # UVU Background Color
-        self.setStyleSheet(f"background-color: {self.primary_color}; color: {self.secondary_color};")
+        self.setStyleSheet(
+            f"background-color: {self.primary_color}; color: {self.secondary_color};"
+        )
 
         layout = QVBoxLayout()
         # Username
         self.email_input = QLineEdit()
         self.email_input.setPlaceholderText("Username")
         layout.addWidget(self.email_input)
-        self.email_input.setStyleSheet("""
+        self.email_input.setStyleSheet(
+            """
             QLineEdit {
                 background-color: white;
                 color: black;
@@ -39,14 +43,16 @@ class LoginDialog(QDialog):
             QLineEdit:focus {
                 border: 2px solid #4C721D;
             }
-        """)
+        """
+        )
 
         # Password
         self.password_input = QLineEdit()
         self.password_input.setPlaceholderText("Password")
         self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
         layout.addWidget(self.password_input)
-        self.password_input.setStyleSheet("""
+        self.password_input.setStyleSheet(
+            """
             QLineEdit {
                 background-color: white;
                 color: black;
@@ -59,25 +65,32 @@ class LoginDialog(QDialog):
             QLineEdit:focus {
                 border: 2px solid #4C721D;
             }
-        """)
+        """
+        )
 
         # Login Button
         button_layout = QHBoxLayout()
         login_button = QPushButton("Login")
         login_button.clicked.connect(self.login)
         button_layout.addWidget(login_button)
-        login_button.setStyleSheet("QPushButton {background-color: #FFFFFF; color: black; } QPushButton:hover {background-color: grey; color: black; }")
+        login_button.setStyleSheet(
+            "QPushButton {background-color: #FFFFFF; color: black; } QPushButton:hover {background-color: grey; color: black; }"
+        )
 
         # Signup Button
         signup_button = QPushButton("Signup")
         signup_button.clicked.connect(self.signup)
         button_layout.addWidget(signup_button)
-        signup_button.setStyleSheet("QPushButton {background-color: #FFFFFF; color: black; } QPushButton:hover {background-color: grey; color: black; }")
+        signup_button.setStyleSheet(
+            "QPushButton {background-color: #FFFFFF; color: black; } QPushButton:hover {background-color: grey; color: black; }"
+        )
 
         # Cancel Button
         cancel_button = QPushButton("Cancel")
         cancel_button.clicked.connect(self.reject)
-        cancel_button.setStyleSheet("QPushButton {background-color: #FFFFFF; color: black; } QPushButton:hover {background-color: grey; color: black; }")
+        cancel_button.setStyleSheet(
+            "QPushButton {background-color: #FFFFFF; color: black; } QPushButton:hover {background-color: grey; color: black; }"
+        )
         button_layout.addWidget(cancel_button)
         layout.addLayout(button_layout)
         self.setLayout(layout)
@@ -88,7 +101,7 @@ class LoginDialog(QDialog):
         password = self.password_input.text()
         payload = '{"email": "' + email + '", "password": "' + password + '"}'
         response = requests.post("https://lms.murtsa.dev/auth", data=payload)
-        #response = requests.post("http://127.0.0.1:8000/auth", data=payload)
+        # response = requests.post("http://127.0.0.1:8000/auth", data=payload)
         # for testing local server
         global token
         token = response.text.strip(
@@ -120,15 +133,20 @@ class LoginDialog(QDialog):
         password = self.password_input.text()
         payload = '{"email": "' + email + '", "password": "' + password + '"}'
         response = requests.post("https://lms.murtsa.dev/signup", data=payload)
-        #response = requests.post("http://127.0.0.1:8000/signup", data=payload)
+        # response = requests.post("http://127.0.0.1:8000/signup", data=payload)
         # for testing local server
 
-        if response.status_code in [200,201]:
-            QMessageBox.information(self, "Success", "Thanks for signing up! You can now log in.")
+        if response.status_code in [200, 201]:
+            QMessageBox.information(
+                self, "Success", "Thanks for signing up! You can now log in."
+            )
             return
         else:
             QMessageBox.warning(
-                self, "Error", f"Signup failed. Status code {response.status_code} for reason {response.reason}.")
+                self,
+                "Error",
+                f"Signup failed. Status code {response.status_code} for reason {response.reason}.",
+            )
             return
 
     # UVU Colors for Login Dialog
@@ -139,11 +157,15 @@ class LoginDialog(QDialog):
             try:
                 with open("colors.json", "r") as f:
                     colors = json.load(f)
-                    self.primary_color = colors.get("primary", default_colors["primary"])
-                    self.secondary_color = colors.get("secondary", default_colors["secondary"])
+                    self.primary_color = colors.get(
+                        "primary", default_colors["primary"]
+                    )
+                    self.secondary_color = colors.get(
+                        "secondary", default_colors["secondary"]
+                    )
             except Exception:
                 self.primary_color = default_colors["primary"]
                 self.secondary_color = default_colors["secondary"]
-        else: 
+        else:
             self.primary_color = default_colors["primary"]
             self.secondary_color = default_colors["secondary"]

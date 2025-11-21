@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 # Import necessary modules
 from PyQt6.QtWidgets import *
 from PyQt6.QtCore import *
@@ -19,7 +18,6 @@ class MainWindow(QMainWindow):
         self.load_colors()
         self.setWindowTitle("Library Management System")
         self.setGeometry(100, 100, self.window_width, self.window_height)
-        #self.setStyleSheet(f"background-color: {self.primary_color};")
 
         # Create a central widget
         central_widget = QWidget()
@@ -43,13 +41,10 @@ class MainWindow(QMainWindow):
         self.stacked_layout.setSpacing(20)
 
         # Add layouts to main
-        #main_layout.addLayout(self.header)
         header_widget = QWidget()
         header_widget.setLayout(self.header)
         header_widget.setStyleSheet(f"background-color: {self.primary_color};")
-
         main_layout.addWidget(header_widget)
-
         main_layout.addLayout(self.stacked_layout)
 
         ## Widgets
@@ -78,10 +73,6 @@ class MainWindow(QMainWindow):
             }
         """)
         self.searchbox.textChanged.connect(self.changed_search)
-                        
-
-        # Navigation bar
-        self.tabs = QTabWidget()
 
         # Home Button
         self.home_button = QPushButton("Home")
@@ -92,9 +83,6 @@ class MainWindow(QMainWindow):
         self.books_button = QPushButton("My Books")
         self.books_button.setStyleSheet("QPushButton {background-color: #FFFFFF; color: black; } QPushButton:hover {background-color: grey; color: black; }")
         self.books_button.clicked.connect(self.clicked_books)
-
-
-        #self.change_button_colors()
 
         # Login Button
         if self.is_logged_in():
@@ -133,7 +121,7 @@ class MainWindow(QMainWindow):
                 self.checkout_button = QPushButton("Check Out")
                 self.checkout_button.setEnabled(True)
                 self.checkout_button.setStyleSheet(
-                    "QPushButton {background-color: black; color: white;} QPushButton:hover {background-color: #3C3F41; color: white; }"
+                    "background-color: black; color: white;"
                 )
                 self.checkout_button.setProperty("book_id", book["id"])
                 self.checkout_button.clicked.connect(self.clicked_checkout)
@@ -173,10 +161,6 @@ class MainWindow(QMainWindow):
                 border: none;
                 font-weight: bold;
             }
-        """)
-        #Alternating row colors
-        self.books_table.setAlternatingRowColors(True)
-        self.books_table.setStyleSheet(self.books_table.styleSheet() + """
             QTableWidget::item:alternate {
                 background-color: #FAFAFA;
             }
@@ -184,6 +168,11 @@ class MainWindow(QMainWindow):
                 background-color: #EDEDED;
             }
         """)
+        #Alternating row colors
+        self.books_table.setAlternatingRowColors(True)
+
+        self.books_table.viewport().update()
+        self.books_table.resizeRowsToContents()
 
         # Checked out books table
         books = self.get_books()
@@ -213,7 +202,7 @@ class MainWindow(QMainWindow):
  
         # Add widgets to stacked layout
         self.stacked_layout.addWidget(books_table_container)
-        self.stacked_layout.addWidget(self.my_books_table)
+        self.stacked_layout.addWidget(my_books_table_container)
 
     # UVU Colors
     def load_colors(self):
@@ -322,15 +311,6 @@ class MainWindow(QMainWindow):
         except FileNotFoundError:
             return False
 
-    def change_button_colors(self) -> None:
-        """Updates the colors of the Home and Books buttons"""
-        if self.stacked_layout.currentIndex() == 0:
-            self.home_button.setStyleSheet("background-color: white; color: black")
-            self.books_button.setStyleSheet("color: white")
-        elif self.stacked_layout.currentIndex() == 1:
-            self.home_button.setStyleSheet("background-color: #b29c82; color: white")
-            self.books_button.setStyleSheet("background-color: white; color: black")
-
     def update_book_list(self):
         """Updates the table of books on the home page"""
         books = self.get_books()
@@ -385,7 +365,7 @@ class MainWindow(QMainWindow):
 
     def changed_search(self):
         """Updates the selected item in the tables when text is entered into the search box"""
-        text = self.searchbox.toPlainText()
+        text = self.searchbox.text()
         if text == "":
             self.books_table.setCurrentItem(None)
             self.my_books_table.setCurrentItem(None)
@@ -513,14 +493,12 @@ class MainWindow(QMainWindow):
     def clicked_home(self):
         """Changes the page to the home menu"""
         self.stacked_layout.setCurrentIndex(0)
-        #self.change_button_colors()
         self.update_book_list()
 
     def clicked_books(self):
         """Changes the page to the my books menu"""
         if self.is_logged_in():
             self.stacked_layout.setCurrentIndex(1)
-            #self.change_button_colors()
             self.update_my_books_list()
             self.login_button.setText("Logout")
             self.login_button.disconnect()
@@ -529,7 +507,6 @@ class MainWindow(QMainWindow):
             self.clicked_login()
             if self.is_logged_in():
                 self.stacked_layout.setCurrentIndex(1)
-            #self.change_button_colors()
             self.update_my_books_list()
 
 

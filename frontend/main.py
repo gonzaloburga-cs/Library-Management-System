@@ -112,6 +112,7 @@ class MainWindow(QMainWindow):
             self.books_table.setItem(i, 0, QTableWidgetItem(f"{book["title"]}"))
             self.books_table.setItem(i, 1, QTableWidgetItem(f"{book["author"]}"))
             self.books_table.setItem(i, 2, QTableWidgetItem(f"{book["isbn"]}"))
+
             if book["is_checked_out"] == True:
                 self.checkout_button = QPushButton("unavailable")
                 self.checkout_button.setEnabled(False)
@@ -157,7 +158,7 @@ class MainWindow(QMainWindow):
     def get_books(self) -> list:
         """This function gets the books from the database and returns the result as a list"""
         response = requests.get("https://lms.murtsa.dev/books")
-        # response = requests.get("http://127.0.0.1:8000/books")
+        #response = requests.get("http://127.0.0.1:8000/books")
 
         try:
             data = response.json()
@@ -180,15 +181,15 @@ class MainWindow(QMainWindow):
             return []
         headers = {"Authorization": token, "Content-Type": "application/json"}
         user_id = requests.get("https://lms.murtsa.dev/user", headers=headers)
-        # user_id = requests.get("http://127.0.0.1:8000/user", headers=headers)
+        #user_id = requests.get("http://127.0.0.1:8000/user", headers=headers)
         user_id = user_id.text.strip('"')
         payload = {"user_id": user_id}
         response = requests.post(
             "https://lms.murtsa.dev/my-books", headers=headers, json=payload
         )
-        # response = requests.post(
-        #     "http://127.0.0.1:8000/my-books", headers=headers, json=payload
-        # )
+        #response = requests.post(
+        #    "http://127.0.0.1:8000/my-books", headers=headers, json=payload
+        #)
 
         if response.status_code == 200:
             try:
@@ -279,15 +280,18 @@ class MainWindow(QMainWindow):
         self.books_table.resizeRowsToContents()
         self.books_table.setSortingEnabled(True)
 
+
     def update_my_books_list(self):
         """Updates the table of books on the my books page"""
         books = self.get_my_books()
         self.my_books_table.setSortingEnabled(False)
         self.my_books_table.setRowCount(len(books))
         for i, book in enumerate(books):
+
+            due_date = book.get("due_date", "N/A")
             self.my_books_table.setItem(i, 0, QTableWidgetItem(f"{book["title"]}"))
             self.my_books_table.setItem(i, 1, QTableWidgetItem(f"{book["author"]}"))
-            self.my_books_table.setItem(i, 2, QTableWidgetItem(f"{book["isbn"]}"))
+            self.my_books_table.setItem(i, 2, QTableWidgetItem(f"{str(due_date)}"))
             self.return_button = QPushButton("Return")
             self.return_button.setStyleSheet(
                 "QPushButton {background-color: black; color: white;} QPushButton:hover {background-color: #3C3F41; color: white; }"
@@ -371,7 +375,7 @@ class MainWindow(QMainWindow):
         sender = self.sender()
         book_id = sender.property("book_id")
         user_id = requests.get("https://lms.murtsa.dev/user", headers=headers)
-        # user_id = requests.get("http://127.0.0.1:8000/user", headers=headers)
+        #user_id = requests.get("http://127.0.0.1:8000/user", headers=headers)
 
         if user_id.status_code != 200:
             QMessageBox.warning(
@@ -383,7 +387,7 @@ class MainWindow(QMainWindow):
         response = requests.put(
             "https://lms.murtsa.dev/checkout", headers=headers, json=payload
         )
-        # response = requests.put('http://127.0.0.1:8000/checkout', headers=headers, json=payload)
+        #response = requests.put('http://127.0.0.1:8000/checkout', headers=headers, json=payload)
         if response.status_code == 200:
             QMessageBox.information(self, "Info", response.text.strip('"'))
             self.update_book_list()
@@ -399,7 +403,7 @@ class MainWindow(QMainWindow):
         sender = self.sender()
         book_id = sender.property("book_id")
         user_id = requests.get("https://lms.murtsa.dev/user", headers=headers)
-        # user_id = requests.get('http://127.0.0.1:8000/user', headers=headers)
+        #user_id = requests.get('http://127.0.0.1:8000/user', headers=headers)
         if user_id.status_code != 200:
             QMessageBox.warning(
                 self, "Error", "Session expired sign in again to return a book"
@@ -410,7 +414,7 @@ class MainWindow(QMainWindow):
         response = requests.put(
             "https://lms.murtsa.dev/return", headers=headers, json=payload
         )
-        # response = requests.put('http://127.0.0.1:8000/return', headers=headers, json=payload)
+        #response = requests.put('http://127.0.0.1:8000/return', headers=headers, json=payload)
         if response.status_code == 200:
             QMessageBox.information(self, "Info", response.text.strip('"'))
             self.update_book_list()

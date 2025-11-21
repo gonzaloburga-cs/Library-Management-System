@@ -93,6 +93,7 @@ class MainWindow(QMainWindow):
         self.books_button.setStyleSheet("QPushButton {background-color: #FFFFFF; color: black; } QPushButton:hover {background-color: grey; color: black; }")
         self.books_button.clicked.connect(self.clicked_books)
 
+
         #self.change_button_colors()
 
         # Login Button
@@ -368,6 +369,7 @@ class MainWindow(QMainWindow):
             self.my_books_table.setItem(i, 1, QTableWidgetItem(f"{book["author"]}"))
             self.my_books_table.setItem(i, 2, QTableWidgetItem(f"{book["isbn"]}"))
             self.return_button = QPushButton("Return")
+            self.return_button.setProperty("book_id", book["id"])
             self.return_button.setStyleSheet("QPushButton {background-color: #FFFFFF; color: black; } QPushButton:hover {background-color: #DDDDDD; color: black; }")
             self.return_button.clicked.connect(self.clicked_return)
             self.my_books_table.setCellWidget(i, 3, self.return_button)
@@ -475,6 +477,9 @@ class MainWindow(QMainWindow):
         headers = {"Authorization": token, "Content-Type": "application/json"}
         sender = self.sender()
         book_id = sender.property("book_id")
+        if not book_id:
+            QMessageBox.warning(self, "Error", "Could not determine book to return")
+            return
         user_id = requests.get("https://lms.murtsa.dev/user", headers=headers)
         # user_id = requests.get('http://127.0.0.1:8000/user', headers=headers)
         if user_id.status_code != 200:

@@ -89,5 +89,6 @@ The Library-Management-System is a web-based application with three main compone
 ### 6. Class Definitions
 
 ### UML Diagram
-<img width="2143" height="1986" alt="Untitled diagram-2025-10-13-014340" src="https://github.com/user-attachments/assets/97948e8b-de7b-4f9d-a474-2bce10fc5cf6" />
+![ClassDefinitions](https://github.com/user-attachments/assets/6d653258-ddb3-45f8-910a-b3cc3405cb43)
+
 

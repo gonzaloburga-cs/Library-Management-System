@@ -35,7 +35,6 @@ The Library-Management-System (LMS) is a web-based application that allows libra
 - **Place Hold / Reserve Item** — User can reserve an item if unavailable
 
 ### 3a. Rainy day use cases
-- **Search Catalog** — No matching books found. System response: "No results found"
 - **Checkout Book** — Item is already checkout. System response: "Book is unavailable. Join waitlist?(y/n)"
 - **Return Book** — Return failed. System response: "Error in return process. Enter book ID again"
 - **Renew Book** - Renewal failed. System response: "Book cannot be renewed because of  waitlist"

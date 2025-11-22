@@ -27,15 +27,15 @@ The Library-Management-System (LMS) is a web-based application that allows libra
 ### 3. Use Cases
 - **Search Catalog** — Student or staff searches books by title, author, ISBN, or subject; results show availability  
 - **Checkout Book** — Student checks out an item and sets the due date  
-- **Return Book** — Process item return and update availability  
-- **Renew Book** — Student or staff renews a checked-out item (if allowed)  
-- **Overdue Notifications** — System sends reminders when items are overdue  
+- **Return Book** — Process item return and update availability   
+- **Overdue Notifications** — System shows late status when items are overdue  
 - **Add / Remove Book** — Librarian manages catalog records  
-- **View Current Loans** — User checks their borrowed books and due dates  
-- **Place Hold / Reserve Item** — User can reserve an item if unavailable
+- **View Current Books** — User checks their borrowed books and due dates  
+
+![use_case_diagram](https://github.com/user-attachments/assets/d88a205e-e6da-4f56-9bec-6b4cf79a62e2)
+
 
 ### 3a. Rainy day use cases
-- **Search Catalog** — No matching books found. System response: "No results found"
 - **Checkout Book** — Item is already checkout. System response: "Book is unavailable. Join waitlist?(y/n)"
 - **Return Book** — Return failed. System response: "Error in return process. Enter book ID again"
 - **Renew Book** - Renewal failed. System response: "Book cannot be renewed because of  waitlist"
@@ -65,6 +65,14 @@ The Library-Management-System is a web-based application with three main compone
 - Postman: Test client for API verification
 - Email service for sending overdue notifications
 
+#### 5. Libraries
+- Alembic and SQLalchemy are both used for our database migrations as well as when we need a more advanced database query than that which the supabase connections is capable.
+- Supabase provides an easy way to connect to the database and perform simple operations
+- Maskpass and Requests are both used on the frontend maskpass to hide the password being typed in and requests is how we call our endpoints from the frontend.
+- Psycopg2 is needed when working with postgreSQL databases like ours and allows us to perform operations on the databse.
+- FastAPI is a framework used for creating RESTful API's
+- PyQT is used on the frontend to create our GUI
+- dotenv is used so that we can more easily work with dot files
 ---
 
 ### 5. Data Flow

@@ -27,12 +27,13 @@ The Library-Management-System (LMS) is a web-based application that allows libra
 ### 3. Use Cases
 - **Search Catalog** — Student or staff searches books by title, author, ISBN, or subject; results show availability  
 - **Checkout Book** — Student checks out an item and sets the due date  
-- **Return Book** — Process item return and update availability  
-- **Renew Book** — Student or staff renews a checked-out item (if allowed)  
-- **Overdue Notifications** — System sends reminders when items are overdue  
+- **Return Book** — Process item return and update availability   
+- **Overdue Notifications** — System shows late status when items are overdue  
 - **Add / Remove Book** — Librarian manages catalog records  
-- **View Current Loans** — User checks their borrowed books and due dates  
-- **Place Hold / Reserve Item** — User can reserve an item if unavailable
+- **View Current Books** — User checks their borrowed books and due dates  
+
+![use_case_diagram](https://github.com/user-attachments/assets/d88a205e-e6da-4f56-9bec-6b4cf79a62e2)
+
 
 ### 3a. Rainy day use cases
 - **Checkout Book** — Item is already checkout. System response: "Book is unavailable. Join waitlist?(y/n)"

@@ -65,6 +65,14 @@ The Library-Management-System is a web-based application with three main compone
 - Postman: Test client for API verification
 - Email service for sending overdue notifications
 
+#### 5. Libraries
+- Alembic and SQLalchemy are both used for our database migrations as well as when we need a more advanced database query than that which the supabase connections is capable.
+- Supabase provides an easy way to connect to the database and perform simple operations
+- Maskpass and Requests are both used on the frontend maskpass to hide the password being typed in and requests is how we call our endpoints from the frontend.
+- Psycopg2 is needed when working with postgreSQL databases like ours and allows us to perform operations on the databse.
+- FastAPI is a framework used for creating RESTful API's
+- PyQT is used on the frontend to create our GUI
+- dotenv is used so that we can more easily work with dot files
 ---
 
 ### 5. Data Flow

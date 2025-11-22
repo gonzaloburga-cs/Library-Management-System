@@ -8,7 +8,7 @@ Server URL: lms.murtsa.dev (lms for library management system)
 
 -For testing purposes use the local URL ( format is url + path i.e. http://127.0.0.1:8000/books to get the list of books if you’re running the server locally or https://lms.murtsa.dev/books for the hosted server)
 
-## Use Case 1: View Books
+## Test Case 1: View Books
 
 * **Test Case Name**: View checked out books
 * **Description**: Make sure users can see their current loaned books
@@ -28,7 +28,7 @@ Server URL: lms.murtsa.dev (lms for library management system)
 
 ---
 
-### Use Case 2: Add Book
+### Test Case 2: Add Book
 
 * **Test Case Name**: Add book to catalog
 * **Description**: Make sure users can add books
@@ -48,7 +48,7 @@ Server URL: lms.murtsa.dev (lms for library management system)
 
 ---
 
-### Use Case 3: Checkout Book
+### Test Case 3: Checkout Book
 
 * **Test Case Name**: Checkout available book
 * **Description**: Verify user can check out available books
@@ -68,7 +68,7 @@ Server URL: lms.murtsa.dev (lms for library management system)
 
 ---
 
-### Use Case 4: Return Item
+### Test Case 4: Return Item
 
 * **Test Case Name**: Return borrowed book
 * **Description**: Make sure availability is updated after book is returned
@@ -88,7 +88,7 @@ Server URL: lms.murtsa.dev (lms for library management system)
 
 ---
 
-### Use Case 5: Login
+### Test Case 5: Login
 
 * **Test Case Name**: Login with authentication token
 * **Description**: Login with authentication token created in sign-up
@@ -108,7 +108,7 @@ Server URL: lms.murtsa.dev (lms for library management system)
 
 ---
 
-### Use Case 6: Exit
+### Test Case 6: Exit
 
 * **Test Case Name**: Exit LMS menu
 * **Description**: Quit the LMS menu once done
@@ -128,7 +128,7 @@ Server URL: lms.murtsa.dev (lms for library management system)
 
 ---
 
-### Use Case 7: Sign Up
+### Test Case 7: Sign Up
 
 * **Test Case Name**: User sign up
 * **Description**: User needs to create an account before being able to check out, return, or add books

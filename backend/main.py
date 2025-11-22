@@ -9,6 +9,7 @@ from time import sleep
 
 sleep_time = 2  # seconds
 
+
 # functions
 def print_menu() -> None:
     """Prints the main menu."""
@@ -33,6 +34,7 @@ def hello_world():
     message = requests.get("https://lms.murtsa.dev/")
     print(message.status_code)
 
+
 def is_logged_in() -> bool:
     """Check if user is logged in by looking for a saved token."""
     try:  # Basic token persistence
@@ -40,8 +42,10 @@ def is_logged_in() -> bool:
             global token
             token = f.read().strip()
             if token:
-                response = requests.get("https://lms.murtsa.dev/user", headers={"Authorization": token})
-                #response = requests.get("http://127.0.0.1:8000/user", headers={"Authorization": token})
+                response = requests.get(
+                    "https://lms.murtsa.dev/user", headers={"Authorization": token}
+                )
+                # response = requests.get("http://127.0.0.1:8000/user", headers={"Authorization": token})
                 if response.status_code != 200:
                     try:
                         os.remove("token.txt")
@@ -49,26 +53,30 @@ def is_logged_in() -> bool:
                         pass
                     del token
                     return False
+            else:
+                return False
             print("Logged in using saved token.")
             return True
     except FileNotFoundError:
         return False
 
+
 def login() -> None:  # puts token in global scope
     """Logs in the user and saves the token to a file."""
     if is_logged_in():
         return
-    
 
     while True:
         email = input("Enter your email: ")
         password = maskpass.askpass("Enter your password: ")
         payload = '{"email": "' + email + '", "password": "' + password + '"}'
-        response = requests.post('https://lms.murtsa.dev/auth', data= payload)
-        #response = requests.post("http://127.0.0.1:8000/auth", data=payload)
+        response = requests.post("https://lms.murtsa.dev/auth", data=payload)
+        # response = requests.post("http://127.0.0.1:8000/auth", data=payload)
         # for testing local server
         global token
-        token = response.text.strip('"')  # the request hits the server, but it returns an empty string
+        token = response.text.strip(
+            '"'
+        )  # the request hits the server, but it returns an empty string
         if response.status_code != 200:
             print(
                 f"Login failed. Status code {response.status_code} for reason {response.reason}. \nPlease check your credentials and try again.\n"
@@ -98,11 +106,12 @@ def login() -> None:  # puts token in global scope
         print(f"Failed to save token to file: {e}")
     print("Login successful!")
 
+
 def logout() -> None:
     """Logs out the user and deletes the saved token."""
     global token  # to modify the global token variable
     requests.post("https://lms.murtsa.dev/logout")
-    #requests.post("http://127.0.0.1:8000/logout")
+    # requests.post("http://127.0.0.1:8000/logout")
     # server.supabase.auth.admin.sign_out(token.strip('"'))
     del token  # remove token from global scope
     return
@@ -113,8 +122,8 @@ def signup() -> None:
     email = input("Enter your email: ")
     password = maskpass.askpass("Enter your password: ")
     payload = '{"email": "' + email + '", "password": "' + password + '"}'
-    response = requests.post('https://lms.murtsa.dev/signup', data=payload)
-    #response = requests.post("http://127.0.0.1:8000/signup", data=payload)
+    response = requests.post("https://lms.murtsa.dev/signup", data=payload)
+    # response = requests.post("http://127.0.0.1:8000/signup", data=payload)
     # for testing local server
     if response.status_code == 200:
         print("User Created Successfully!")
@@ -124,11 +133,12 @@ def signup() -> None:
         print_menu()
         return
 
+
 def print_books() -> None:
     """Fetches and prints the list of books from the server."""
     clear_screen()
-    response = requests.get('https://lms.murtsa.dev/books')
-    #response = requests.get("http://127.0.0.1:8000/books")
+    response = requests.get("https://lms.murtsa.dev/books")
+    # response = requests.get("http://127.0.0.1:8000/books")
 
     try:
         data = response.json()
@@ -149,15 +159,57 @@ def print_books() -> None:
     input("\nPress Enter to continue...")
 
 
+def print_my_books() -> None:
+    """Gets the books the user has checked out and returns it as a list"""
+    if is_logged_in() == False:
+        return
+    headers = {"Authorization": token, "Content-Type": "application/json"}
+    user_id = requests.get("https://lms.murtsa.dev/user", headers=headers)
+    # user_id = requests.get("http://127.0.0.1:8000/user", headers=headers)
+    user_id = user_id.text.strip('"')
+    payload = {"user_id": user_id}
+    response = requests.post(
+        "https://lms.murtsa.dev/my-books", headers=headers, json=payload
+    )
+    if response.status_code == 200:
+        try:
+            data = response.json()
+        except json.JSONDecodeError:
+            print("Failed to decode JSON response.")
+            return
+        if "error" in data:
+            print(f"Error fetching books: {data['error']['message']}")
+            return
+        try:
+            books = data["data"]
+        except TypeError:
+            print(data)
+            return
+        if books == []:
+            print("There was a connection error")
+        print(f"\n{'-'*20} Books {'-'*20}\n")
+        for book in books:
+            print(
+                f"\nTitle: {book['title']}, Author: {book['author']}, ISBN: {book['isbn']}, ID: {book['id']}"
+            )
+    else:
+        print(
+            f"There was an error, code: {response.status_code} {response.text}",
+        )
+        return
+
+
 def add_book() -> None:
     """Adds a new book to the library."""
     title = input("Enter book title: ")
     author = input("Enter book author: ")
     isbn = input("Enter book ISBN: ")
     headers = {"Authorization": token, "Content-Type": "application/json"}
-    payload = {"title":title, "author": author, "isbn": isbn }
-    response = requests.put('https://lms.murtsa.dev/book', headers=headers, json=payload)
-    #response = requests.put("http://127.0.0.1:8000/book", headers=headers, json=payload)
+    payload = {"title": title, "author": author, "isbn": isbn}
+    response = requests.put(
+        "https://lms.murtsa.dev/book", headers=headers, json=payload
+    )
+    # response = requests.put("http://127.0.0.1:8000/book", headers=headers, json=payload)
     if response.status_code != 200:
         print(
             f"Failed to add book. Status code: {response.status_code}, Response: {response.text}\n"
@@ -177,7 +229,7 @@ def checkout_book() -> None:
 
     book_id = input("Enter the ID of the book you want to checkout: ")
     user_id = requests.get("https://lms.murtsa.dev/user", headers=headers)
-    #user_id = requests.get("http://127.0.0.1:8000/user", headers=headers)
+    # user_id = requests.get("http://127.0.0.1:8000/user", headers=headers)
 
     if user_id.status_code != 200:
         print("Session expired sign in again to checkout a book")
@@ -185,40 +237,47 @@ def checkout_book() -> None:
         return
 
     payload = {"book_id": book_id, "user_id": user_id.text.strip('"')}
-    response = requests.put('https://lms.murtsa.dev/checkout', headers=headers, json=payload)
-    #response = requests.put('http://127.0.0.1:8000/checkout', headers=headers, json=payload)
+    response = requests.put(
+        "https://lms.murtsa.dev/checkout", headers=headers, json=payload
+    )
+    # response = requests.put('http://127.0.0.1:8000/checkout', headers=headers, json=payload)
     if response.status_code == 200:
-        print("\n"+response.text.strip('"'))
+        print("\n" + response.text.strip('"'))
         sleep(sleep_time)
     else:
-        print(f"\nFailed to checkout book. Status code: {response.status_code}, Response: {response.text}\n")
+        print(
+            f"\nFailed to checkout book. Status code: {response.status_code}, Response: {response.text}\n"
+        )
         sleep(sleep_time)
     return
 
 
 def return_book() -> None:
     """Returns a book for the logged-in user."""
-    print_books()
+    print_my_books()
     headers = {"Authorization": token, "Content-Type": "application/json"}
 
     book_id = input("Enter the ID of the book you want to return: ")
     user_id = requests.get("https://lms.murtsa.dev/user", headers=headers)
-    #user_id = requests.get('http://127.0.0.1:8000/user', headers=headers)
+    # user_id = requests.get('http://127.0.0.1:8000/user', headers=headers)
     if user_id.status_code != 200:
         print("Session expired sign in again to return a book")
         return
 
     payload = {"book_id": book_id, "user_id": user_id.text.strip('"')}
-    response = requests.put('https://lms.murtsa.dev/return', headers=headers, json=payload)
-    #response = requests.put('http://127.0.0.1:8000/return', headers=headers, json=payload)
+    response = requests.put(
+        "https://lms.murtsa.dev/return", headers=headers, json=payload
+    )
+    # response = requests.put('http://127.0.0.1:8000/return', headers=headers, json=payload)
     if response.status_code == 200:
-        print("\n"+response.text.strip('"'))
+        print("\n" + response.text.strip('"'))
         sleep(sleep_time)
     else:
-        print(f"\nFailed to return book. Status code: {response.status_code}, Response: {response.text}\n")
+        print(
+            f"\nFailed to return book. Status code: {response.status_code}, Response: {response.text}\n"
+        )
         sleep(sleep_time)
     return
-
 
 
 def clear_screen() -> None:
@@ -229,15 +288,13 @@ def clear_screen() -> None:
         os.system("clear")  # for linux, mac, etc.
 
 
-
-
 # main
 def main():
     """Main function to run the Library Management System."""
-    
+
     if is_logged_in():
         pass
-    
+
     try:
         # print("Please Choose an option:")
         while True:
@@ -285,7 +342,7 @@ def main():
                     sleep(sleep_time)
                     break
                 case "7":
-                       signup()
+                    signup()
                 case _:
                     print("Invalid choice. Please try again.")
                     sleep(sleep_time)
@@ -295,7 +352,7 @@ def main():
         sys.exit(0)
     except Exception as e:
         # print(f"An error occurred: {e}")
-        traceback.print_exc() # uncomment for debugging
+        traceback.print_exc()  # uncomment for debugging
     finally:
         print("Goodbye!")
         sys.exit(0)

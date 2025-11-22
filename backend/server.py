@@ -5,7 +5,7 @@ from fastapi import FastAPI, Depends, Request
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 from dotenv import load_dotenv
 
@@ -62,17 +62,30 @@ async def get_my_books(request: Request):
     supabase.postgrest.auth(auth_token)
 
     # queries
-    my_books = "select id, title, author, isbn from books where id in (select book_id from checkout_logs where checkin_date IS NULL AND user_id=:user_id);"
+    my_books = "select id, title, author, isbn, due_date from books where id in (select book_id from checkout_logs where checkin_date IS NULL AND user_id=:user_id);"
 
     with engine.connect() as connection:
         result = connection.execute(text(my_books), {"user_id": data["user_id"]})
+
         data = {"data": []}
         if result.rowcount == 0:
             response = "You haven't checked out any books"
         else:
             for book in result:
-                data["data"].append({"id": book._data[0], "title": book._data[1], "author": book._data[2], "isbn": book._data[3]})
+                data["data"].append({"id": book._data[0], "title": book._data[1], "author": book._data[2], "isbn": book._data[3], "due_date": book._data[4]})
             response = data
+
+        '''rows = result.mappings()
+        books = []
+        for row in rows:
+            books.append({
+                "id": row["id"],
+                "title": row["title"],
+                "author": row["author"],
+                "isbn": row["isbn"],
+                "due_date": row["due_date"]
+            })
+        response = {"data": books}'''
 
     return response
 
@@ -153,9 +166,11 @@ async def checkout_book(request: Request):
     if is_checked_out.data:
         response = "This Book is not currently available for checkout"
     else:
+
+        due_date = (datetime.now(timezone.utc) + timedelta(days=14)).date().isoformat()
         supabase.table("checkout_logs").upsert({"book_id": data["book_id"], "user_id": data["user_id"]}).execute()
-        supabase.table("books").update({"is_checked_out": True}).eq("id", data["book_id"]).execute()
-        response = "Book successfully checked out"
+        supabase.table("books").update({"is_checked_out": True, "due_date": due_date}).eq("id", data["book_id"]).execute()
+        response = "Book successfully checked out! Due date: " + due_date
 
     return response
 
@@ -177,7 +192,7 @@ async def return_book(request: Request):
         if result.rowcount == 0:
             response = "This book isn't currently checked out by you"
         else:
-            supabase.table("books").update({"is_checked_out": False}).eq("id", data["book_id"]).execute()
+            supabase.table("books").update({"is_checked_out": False, "due_date": None}).eq("id", data["book_id"]).execute()
             connection.execute(text(checkin_book), {"book_id": data["book_id"], "user_id": data["user_id"],
                                                     "current_date": current_date.strftime('%Y-%m-%d %H:%M:%S %z')})
             connection.commit()

@@ -4,6 +4,7 @@ from PyQt6.QtWidgets import *
 from PyQt6.QtCore import *
 from PyQt6.QtGui import *
 from login_dialog import LoginDialog
+from datetime import datetime, timedelta
 import os
 import requests
 import json
@@ -366,13 +367,21 @@ class MainWindow(QMainWindow):
         books = self.get_my_books()
         self.my_books_table.setSortingEnabled(False)
         self.my_books_table.setRowCount(len(books))
+        current_date = datetime.now()
+        fourteen_days_ago = current_date - timedelta(days=14)
+
         for i, book in enumerate(books):
 
             due_date = book.get("due_date", "N/A")
+            date_format = "%Y-%m-%d"
+            due_date_object = datetime.strptime(due_date, date_format)
             self.my_books_table.setItem(i, 0, QTableWidgetItem(f"{book["title"]}"))
             self.my_books_table.setItem(i, 1, QTableWidgetItem(f"{book["author"]}"))
             self.my_books_table.setItem(i, 2, QTableWidgetItem(f"{str(due_date)}"))
-            self.return_button = QPushButton("Return")
+            if due_date_object < fourteen_days_ago:
+                self.return_button = QPushButton("Return (Late)")
+            else:
+                self.return_button = QPushButton("Return")
             self.return_button.setProperty("book_id", book["id"])
             self.return_button.setStyleSheet(
                 "QPushButton {background-color: #FFFFFF; color: black; } QPushButton:hover {background-color: #DDDDDD; color: black; }"

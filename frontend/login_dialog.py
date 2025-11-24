@@ -136,17 +136,14 @@ class LoginDialog(QDialog):
         # response = requests.post("http://127.0.0.1:8000/signup", data=payload)
         # for testing local server
 
-        if response.status_code in [200, 201]:
+        if response.json().get("status") in [200, 201]:
             QMessageBox.information(
                 self, "Success", "Thanks for signing up! You can now log in."
             )
             return
         else:
             QMessageBox.warning(
-                self,
-                "Error",
-                f"Signup failed. Status code {response.status_code} for reason {response.reason}.",
-            )
+                self, "Error", f"Error: {response.json().get('message')}")
             return
 
     # UVU Colors for Login Dialog

@@ -160,6 +160,7 @@ Transaction: (book ID, checkout date, return date)
     - Portability | Compatible with different browsers and devices
 
 ### 3.7 Traceability Matrix
+- links project requirements to deliverables
 
 | Requirement ID | Requirement Description | Design Element | Test Case ID |
 |----------------|------------------------|----------------|--------------|
